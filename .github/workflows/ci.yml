@@ -67,7 +67,7 @@ jobs:
         shell: bash
       - run: python tools/check_dist.py --install
       - run: python -I tools/smoke_test.py --installed --onnx
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: correctness-${{ matrix.os }}-py${{ matrix.python }}
@@ -112,7 +112,7 @@ jobs:
       - run: python -m pip install "torch==${{ matrix.torch }}" --index-url https://download.pytorch.org/whl/cpu
       - run: python -m pip install -e ".[legacy,onnx,native]" pytest
       - run: python -m pytest tests/test_version_compatibility.py tests/test_native_compatibility.py -q --junitxml=.artifacts/version.xml
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: pytorch-${{ matrix.torch }}
