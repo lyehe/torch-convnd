@@ -30,7 +30,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-legacy = ["numpy>=1.23.2,<2"]
+legacy = ["numpy>=1.23.2,<3"]
 native = ["ninja>=1.11", "setuptools>=70", "packaging>=23"]
 dev = [
   "pytest>=8", "pytest-cov>=6", "hypothesis>=6.100",
@@ -38,7 +38,7 @@ dev = [
   "build>=1", "twine>=6", "numpy>=1.24", "pyyaml>=6",
   "ninja>=1.11", "setuptools>=70", "packaging>=23",
 ]
-docs = ["mkdocs>=1.6,<2", "mkdocstrings[python]>=0.26", "pymdown-extensions>=10,<12"]
+docs = ["mkdocs>=1.6,<2", "mkdocstrings[python]>=0.26", "pymdown-extensions>=10,<13"]
 onnx = ["onnx>=1.17", "onnxscript>=0.2", "onnxruntime>=1.22"]
 
 [project.urls]
