@@ -13,7 +13,7 @@ capabilities. No training framework is required.
 import torch
 from torch_convnd import Conv4d
 
-layer = Conv4d(2, 8, kernel_size=3, padding=1, backend="torch")
+layer = Conv4d(in_channels=2, out_channels=8, kernel_size=3, padding=1, backend="torch")
 x = torch.randn(1, 2, 4, 4, 4, 8, requires_grad=True)
 y = layer(x)                       # [1, 8, 4, 4, 4, 8]
 y.square().mean().backward()
@@ -73,16 +73,46 @@ and a batched 6D convolution takes an 8-axis tensor.
 import torch
 from torch_convnd import ConvNd
 
-conv5 = ConvNd(2, 8, 3, dimensions=5, padding=1, backend="torch")
-x5 = torch.randn(1, 2, 4, 4, 4, 4, 4, requires_grad=True)
-y5 = conv5(x5)  # [1, 8, 4, 4, 4, 4, 4]
-
-conv6 = ConvNd(2, 8, 3, dimensions=6, padding=1, backend="torch")
+conv6 = ConvNd(
+    in_channels=2,
+    out_channels=8,
+    kernel_size=3,
+    dimensions=6,
+    padding=1,
+    backend="torch",
+)
+# Layout: [batch, channels, D1, D2, D3, D4, D5, D6].
 x6 = torch.randn(1, 2, 3, 3, 3, 3, 3, 3, requires_grad=True)
 y6 = conv6(x6)  # [1, 8, 3, 3, 3, 3, 3, 3]
 
+conv5 = ConvNd(
+    in_channels=2, out_channels=8, kernel_size=3, dimensions=5, padding=1, backend="torch"
+)
+x5 = torch.randn(1, 2, 4, 4, 4, 4, 4, requires_grad=True)
+y5 = conv5(x5)  # [1, 8, 4, 4, 4, 4, 4]
+
 (y5.square().mean() + y6.square().mean()).backward()
 ```
+
+In the positional spelling `ConvNd(2, 8, 3, dimensions=6)`, the first two
+numbers describe channels; `dimensions=6` specifies how many grid axes to convolve:
+
+| Argument | Meaning in the 6D example |
+| --- | --- |
+| `in_channels=2` | Each grid location supplies two input features, so the input's channel axis has size 2. |
+| `out_channels=8` | The layer learns eight output feature maps, so the output's channel axis has size 8. |
+| `kernel_size=3` | The kernel spans three positions along each of the six grid axes. |
+| `dimensions=6` | There are six convolved axes, excluding batch and channels. |
+| `padding=1` | Add one zero on each side of every grid axis; with the default stride and dilation of 1, spatial sizes stay unchanged. |
+
+With the default `groups=1`, each output feature combines both input channels
+over its six-axis neighborhood. The weight tensor has shape
+`[8, 2, 3, 3, 3, 3, 3, 3]`: eight filters, two input channels per filter, and six
+kernel axes. The batch size is 1 here and is independent of those channel counts.
+The backward call computes gradients for the inputs and learned parameters.
+
+Run the standalone [6D example](examples/conv6d.py) with
+`python examples/conv6d.py` to print the input, weight, output and gradient shapes.
 
 The generic layer accepts 1-62 spatial dimensions. `kernel_size`, `stride`,
 `padding` and `dilation` accept a scalar or a tuple with one entry per spatial
