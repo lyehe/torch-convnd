@@ -1,0 +1,27 @@
+{
+  "version": "0.5.0",
+  "wheel_sha256": "53ec09338b2e0bbc6c4458185122ae1ad3cc46563759087f1d0f44285db44541",
+  "bundled_sources_checked": true,
+  "mandatory_runtime_dependencies": [
+    "torch>=1.11"
+  ],
+  "isolated_wheel_checks": [
+    {
+      "torch": "1.11.0+cpu",
+      "backend": "torch",
+      "serialization": "script and trace with forward AD",
+      "onnx_runtime": "passed",
+      "result": "passed"
+    },
+    {
+      "torch": "2.10.0+cu130",
+      "device": "cuda:0",
+      "backend": "native",
+      "serialization": "script and trace with torch.func.jvp",
+      "onnx_runtime": "passed",
+      "result": "passed"
+    }
+  ],
+  "core_compatibility": "18 release lines, 778 passed, 122 framework-unavailable skips, 0 failures",
+  "full_regression": "1060 passed on CPU/CUDA; 602 passed and 458 CUDA skips on the newer CPU environment"
+}

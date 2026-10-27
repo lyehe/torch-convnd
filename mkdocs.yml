@@ -1,0 +1,36 @@
+site_name: torch-convnd
+site_description: Full N-dimensional convolution for ordinary PyTorch projects
+repo_url: https://github.com/lyehe/torch-convnd
+edit_uri: edit/main/docs/
+theme:
+  name: readthedocs
+nav:
+  - Overview: index.md
+  - Installation: installation.md
+  - Integration guide: integration.md
+  - API reference: api.md
+  - Backends and compatibility: support.md
+  - Correctness: PARITY.md
+  - Performance: PERFORMANCE.md
+  - Development and tests: development.md
+  - Releases and deployment: releasing.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: false
+            show_signature_annotations: true
+            separate_signature: true
+markdown_extensions:
+  - admonition
+  - fenced_code
+  - tables
+validation:
+  nav:
+    omitted_files: warn
+  links:
+    not_found: warn
+    unrecognized_links: warn

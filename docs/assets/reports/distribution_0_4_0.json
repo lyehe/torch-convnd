@@ -1,0 +1,35 @@
+{
+  "version": "0.4.0",
+  "wheel_sha256": "05229f4670d384ae3e889a4755b5f525f2a1ee07800d061408a256cbee059bb3",
+  "bundled_sources_checked": true,
+  "mandatory_runtime_dependencies": [
+    "torch>=2.10"
+  ],
+  "typing": {
+    "pep561": true,
+    "installed_wheel_mypy": "passed"
+  },
+  "isolated_installed_wheel_checks": [
+    {
+      "python": "3.10.20",
+      "torch": "2.10.0+cu130",
+      "device": "cuda:0 (RTX 4090)",
+      "result": "passed"
+    },
+    {
+      "python": "3.13.12",
+      "torch": "2.14.1+cpu",
+      "device": "cpu",
+      "result": "passed"
+    }
+  ],
+  "smoke_coverage": [
+    "stock 2D/3D values and parameter/input gradients",
+    "full native 4D training",
+    "script and trace save/load with nonzero JVP",
+    "standard 4D ONNX CPU inference",
+    "noneditable site-packages imports"
+  ],
+  "remote_ci_status": "Configured for Linux/Windows/macOS, not executed from this workspace.",
+  "publication_status": "Not published."
+}

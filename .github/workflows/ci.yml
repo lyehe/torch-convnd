@@ -1,0 +1,119 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install -e ".[dev,docs]"
+      - run: pre-commit run --all-files
+      - name: Validate workflow syntax
+        uses: docker://rhysd/actionlint:1.7.12
+      - run: python -m mypy
+      - run: python -m mkdocs build --strict
+
+  correctness:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }} / ${{ matrix.torch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, python: '3.10', torch: 'torch==2.10.0'}
+          - {os: windows-latest, python: '3.10', torch: 'torch==2.10.0'}
+          - {os: macos-latest, python: '3.10', torch: 'torch==2.10.0'}
+          - {os: ubuntu-latest, python: '3.12', torch: torch}
+          - {os: windows-latest, python: '3.13', torch: torch}
+          - {os: macos-latest, python: '3.13', torch: torch}
+          - {os: ubuntu-latest, python: '3.14', torch: torch}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    env:
+      MAX_JOBS: '2'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+      CUBLAS_WORKSPACE_CONFIG: ':4096:8'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install CPU PyTorch on Linux and Windows
+        if: runner.os != 'macOS'
+        run: python -m pip install "${{ matrix.torch }}" --index-url https://download.pytorch.org/whl/cpu
+      - name: Install PyTorch on macOS
+        if: runner.os == 'macOS'
+        run: python -m pip install "${{ matrix.torch }}"
+      - run: python -m pip install -e ".[dev,onnx]"
+      - run: python -m pytest -q --cov --cov-report=xml --junitxml=.artifacts/correctness.xml
+      - run: python benchmarks/summarize_tests.py --junit .artifacts/correctness.xml --output .artifacts/correctness.json
+      - run: python -m build
+      - run: python -m twine check dist/*
+        shell: bash
+      - run: python tools/check_dist.py --install
+      - run: python -I tools/smoke_test.py --installed --onnx
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: correctness-${{ matrix.os }}-py${{ matrix.python }}
+          path: |
+            .artifacts/*.xml
+            .artifacts/*.json
+            coverage.xml
+            dist/*
+
+  portable-install:
+    name: Minimal install without build tools
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - run: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install .
+      - run: python -I tools/smoke_test.py --installed --backend torch
+      - run: torch-convnd-info --json
+
+  versions:
+    name: PyTorch ${{ matrix.torch }} compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        torch: ['1.11.0', '1.12.1', '1.13.1', '2.0.1', '2.1.2', '2.2.2',
+                '2.3.1', '2.4.1', '2.5.1', '2.6.0', '2.7.1', '2.8.0',
+                '2.9.0', '2.10.0', '2.11.0', '2.12.1', '2.13.0', '2.14.1']
+    env:
+      MAX_JOBS: '2'
+      OMP_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.10'
+          cache: pip
+      - run: python -m pip install "torch==${{ matrix.torch }}" --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install -e ".[legacy,onnx,native]" pytest
+      - run: python -m pytest tests/test_version_compatibility.py tests/test_native_compatibility.py -q --junitxml=.artifacts/version.xml
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pytorch-${{ matrix.torch }}
+          path: .artifacts/version.xml

@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.whl binary
+*.gz binary
+*.png binary
+# Archived measurements retain their original bytes for provenance checks.
+docs/assets/reports/*.json -text

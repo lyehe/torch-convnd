@@ -1,0 +1,36 @@
+minimum_pre_commit_version: '4.2.0'
+default_stages: [pre-commit]
+exclude: ^(?:docs/assets/reports|benchmarks/results)/.*\.json$
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-ast
+      - id: check-toml
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.3
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+        types_or: [python, pyi]
+      - id: ruff-format
+        types_or: [python, pyi]
+  - repo: local
+    hooks:
+      - id: portable-correctness
+        name: portable correctness tests
+        entry: python tools/run_portable_tests.py
+        language: python
+        pass_filenames: false
+        types_or: [python, pyi]
+        stages: [pre-push]

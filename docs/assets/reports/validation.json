@@ -1,0 +1,24 @@
+{
+  "python": "3.10.20",
+  "platform": "Windows",
+  "torch": "2.10.0+cu130",
+  "tests": {
+    "tests": 55,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "checks": {
+    "ruff": "passed",
+    "sdist_build": "passed",
+    "wheel_build": "passed",
+    "isolated_installed_wheel_cpu_forward_backward": "passed",
+    "isolated_installed_wheel_cuda_forward_backward": "passed",
+    "benchmark_source_hashes_match": "passed"
+  },
+  "source_sha256": {
+    "convnd.cpp": "9d7dd81bb2c99523ef55f53d679c33e0e1c5a726dfc5ea37adb802a0485ec1f4",
+    "convnd.h": "534645fe0abec57b77dec36008e3491d447f8ae00c30b7b145118a51c624db69",
+    "convnd_cuda.cu": "fc2c7b354da11cd55b2f9e86235898da4745cef41595576348a9bf50453e4331"
+  }
+}

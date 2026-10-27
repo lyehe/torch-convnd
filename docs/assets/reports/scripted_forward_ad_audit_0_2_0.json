@@ -1,0 +1,41 @@
+{
+  "torch": "2.10.0+cu130",
+  "cases": [
+    {
+      "rank": 2,
+      "device": "cpu",
+      "dtype": "float64",
+      "stock_script_jvp_norm": 0.6491103134675728,
+      "stock_script_dual_has_tangent": true,
+      "package_script_jvp_norm": 0.0,
+      "package_script_dual_error": "The following operation failed in the TorchScript interpreter.\nTraceback of TorchScript (most recent call last):\n  File \"C:\\Users\\jenkinslab\\project\\torch-convnd\\src\\torch_convnd\\_script.py\", line 127, in forward\n            output = self._complex(input)\n        else:\n            output = self._real(input, self.weight, self.bias)\n                     ~~~~~~~~~~ <--- HERE\n        if self.dimensions == 2:\n            if original_input.is_contiguous(memory_format=torch.channels_last):\n  File \"C:\\Users\\jenkinslab\\project\\torch-convnd\\src\\torch_convnd\\_script.py\", line 86, in _real\n    def _real(self, input: Tensor, weight: Tensor, bias: Tensor | None) -> Tensor:\n        return torch.ops.torch_convnd.conv_nd(\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE\n            input,\n            weight,\nRuntimeError: NotImplementedError: You must implement the jvp function for custom autograd.Function to use it with forward mode AD.\n\nAt:\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(466): jvp\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(324): apply_jvp\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(583): apply\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\_library\\autograd.py(110): autograd_impl\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\nn\\modules\\module.py(1787): _call_impl\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\nn\\modules\\module.py(1776): _wrapped_call_impl\n  <stdin>(27): <module>\n\n"
+    },
+    {
+      "rank": 3,
+      "device": "cpu",
+      "dtype": "float64",
+      "stock_script_jvp_norm": 0.2615232594706521,
+      "stock_script_dual_has_tangent": true,
+      "package_script_jvp_norm": 0.0,
+      "package_script_dual_error": "The following operation failed in the TorchScript interpreter.\nTraceback of TorchScript (most recent call last):\n  File \"C:\\Users\\jenkinslab\\project\\torch-convnd\\src\\torch_convnd\\_script.py\", line 127, in forward\n            output = self._complex(input)\n        else:\n            output = self._real(input, self.weight, self.bias)\n                     ~~~~~~~~~~ <--- HERE\n        if self.dimensions == 2:\n            if original_input.is_contiguous(memory_format=torch.channels_last):\n  File \"C:\\Users\\jenkinslab\\project\\torch-convnd\\src\\torch_convnd\\_script.py\", line 86, in _real\n    def _real(self, input: Tensor, weight: Tensor, bias: Tensor | None) -> Tensor:\n        return torch.ops.torch_convnd.conv_nd(\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE\n            input,\n            weight,\nRuntimeError: NotImplementedError: You must implement the jvp function for custom autograd.Function to use it with forward mode AD.\n\nAt:\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(466): jvp\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(324): apply_jvp\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(583): apply\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\_library\\autograd.py(110): autograd_impl\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\nn\\modules\\module.py(1787): _call_impl\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\nn\\modules\\module.py(1776): _wrapped_call_impl\n  <stdin>(27): <module>\n\n"
+    },
+    {
+      "rank": 2,
+      "device": "cuda",
+      "dtype": "float64",
+      "stock_script_jvp_norm": 1.4438476213114857,
+      "stock_script_dual_has_tangent": true,
+      "package_script_jvp_norm": 0.0,
+      "package_script_dual_error": "The following operation failed in the TorchScript interpreter.\nTraceback of TorchScript (most recent call last):\n  File \"C:\\Users\\jenkinslab\\project\\torch-convnd\\src\\torch_convnd\\_script.py\", line 127, in forward\n            output = self._complex(input)\n        else:\n            output = self._real(input, self.weight, self.bias)\n                     ~~~~~~~~~~ <--- HERE\n        if self.dimensions == 2:\n            if original_input.is_contiguous(memory_format=torch.channels_last):\n  File \"C:\\Users\\jenkinslab\\project\\torch-convnd\\src\\torch_convnd\\_script.py\", line 86, in _real\n    def _real(self, input: Tensor, weight: Tensor, bias: Tensor | None) -> Tensor:\n        return torch.ops.torch_convnd.conv_nd(\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE\n            input,\n            weight,\nRuntimeError: NotImplementedError: You must implement the jvp function for custom autograd.Function to use it with forward mode AD.\n\nAt:\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(466): jvp\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(324): apply_jvp\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(583): apply\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\_library\\autograd.py(110): autograd_impl\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\nn\\modules\\module.py(1787): _call_impl\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\nn\\modules\\module.py(1776): _wrapped_call_impl\n  <stdin>(27): <module>\n\n"
+    },
+    {
+      "rank": 3,
+      "device": "cuda",
+      "dtype": "float64",
+      "stock_script_jvp_norm": 2.5306496090248998,
+      "stock_script_dual_has_tangent": true,
+      "package_script_jvp_norm": 0.0,
+      "package_script_dual_error": "The following operation failed in the TorchScript interpreter.\nTraceback of TorchScript (most recent call last):\n  File \"C:\\Users\\jenkinslab\\project\\torch-convnd\\src\\torch_convnd\\_script.py\", line 127, in forward\n            output = self._complex(input)\n        else:\n            output = self._real(input, self.weight, self.bias)\n                     ~~~~~~~~~~ <--- HERE\n        if self.dimensions == 2:\n            if original_input.is_contiguous(memory_format=torch.channels_last):\n  File \"C:\\Users\\jenkinslab\\project\\torch-convnd\\src\\torch_convnd\\_script.py\", line 86, in _real\n    def _real(self, input: Tensor, weight: Tensor, bias: Tensor | None) -> Tensor:\n        return torch.ops.torch_convnd.conv_nd(\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE\n            input,\n            weight,\nRuntimeError: NotImplementedError: You must implement the jvp function for custom autograd.Function to use it with forward mode AD.\n\nAt:\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(466): jvp\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(324): apply_jvp\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\autograd\\function.py(583): apply\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\_library\\autograd.py(110): autograd_impl\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\nn\\modules\\module.py(1787): _call_impl\n  C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\lib\\site-packages\\torch\\nn\\modules\\module.py(1776): _wrapped_call_impl\n  <stdin>(27): <module>\n\n"
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "torch": "2.10.0+cu130",
+  "cuda_runtime": "13.0",
+  "device": "cuda:0",
+  "device_name": "NVIDIA GeForce RTX 4090",
+  "dtype": "torch.float32",
+  "input_shape": [
+    1,
+    8,
+    16,
+    16,
+    16,
+    32
+  ],
+  "weight_shape": [
+    16,
+    8,
+    3,
+    3,
+    3,
+    3
+  ],
+  "workspace_mib": 16,
+  "iterations": 30,
+  "warmup": 10,
+  "tf32_matmul": false,
+  "tf32_cudnn": false,
+  "correctness": {
+    "output_max_absolute_error": 8.392333984375e-05,
+    "gradient_max_absolute_errors": [
+      7.62939453125e-05,
+      0.002532958984375,
+      0.0
+    ]
+  },
+  "results": {
+    "native_nd": {
+      "forward": {
+        "median_ms": 2.9828997794538736,
+        "min_ms": 2.8302003629505634,
+        "max_ms": 5.764500238001347,
+        "peak_extra_allocated_bytes": 16877568
+      },
+      "forward_backward": {
+        "median_ms": 8.689300157129765,
+        "min_ms": 7.986200042068958,
+        "max_ms": 9.644299745559692,
+        "peak_extra_allocated_bytes": 41944064
+      }
+    },
+    "conv3d_tap_reference": {
+      "forward": {
+        "median_ms": 0.9830500930547714,
+        "min_ms": 0.9026001207530499,
+        "max_ms": 1.4451001770794392,
+        "peak_extra_allocated_bytes": 63438848
+      },
+      "forward_backward": {
+        "median_ms": 4.000949906185269,
+        "min_ms": 3.918199799954891,
+        "max_ms": 4.510600119829178,
+        "peak_extra_allocated_bytes": 63480320
+      }
+    }
+  },
+  "limitations": [
+    "One shape, FP32, no optimizer state, shared machine; not an end-to-end training claim.",
+    "Both operators implement full 4D weights; the reference uses batched Conv3d taps.",
+    "Workspace excludes tensor storage, copies and weight-gradient/GEMM temporaries."
+  ]
+}

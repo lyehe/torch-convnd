@@ -1,0 +1,4728 @@
+{
+  "package_version": "0.5.0",
+  "scope": "Core/native adoption contract across 18 releases; advanced APIs are conditional on framework capabilities. Full modern CPU/CUDA reports are separate.",
+  "versions": [
+    {
+      "torch_release": "1.11.0",
+      "platform": "Windows CPU",
+      "passed": 32,
+      "skipped": 18,
+      "failed": 0,
+      "junit_sha256": "846ad705fb959a8cdeb29faf14a87a83b99d3a2bbdd6bdaa06da41e6bc43c808",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "skipped",
+          "skip_reason": "torch.func is absent in this PyTorch"
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        }
+      ]
+    },
+    {
+      "torch_release": "1.12.1",
+      "platform": "Windows CPU",
+      "passed": 32,
+      "skipped": 18,
+      "failed": 0,
+      "junit_sha256": "ceacc3ba583c9c326b1877614a2e41b672a7fd0f34354e62d2ec1dce44b3bfe2",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "skipped",
+          "skip_reason": "torch.func is absent in this PyTorch"
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        }
+      ]
+    },
+    {
+      "torch_release": "1.13.1",
+      "platform": "Windows CPU",
+      "passed": 32,
+      "skipped": 18,
+      "failed": 0,
+      "junit_sha256": "c0f42b3428811e6028681c3754b3b70e0e69212a099eb5ac1df28bcd53ba170d",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "skipped",
+          "skip_reason": "torch.func is absent in this PyTorch"
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        }
+      ]
+    },
+    {
+      "torch_release": "2.0.1",
+      "platform": "Windows CPU",
+      "passed": 33,
+      "skipped": 17,
+      "failed": 0,
+      "junit_sha256": "619f94cdcfb10025992267bf052918c62fa332f5b5c231239fe09cb085038c30",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        }
+      ]
+    },
+    {
+      "torch_release": "2.1.2",
+      "platform": "Windows CPU",
+      "passed": 33,
+      "skipped": 17,
+      "failed": 0,
+      "junit_sha256": "109011473fa1a9ab1e2a72466c001a4b2e592413ccbe123727a8618374705591",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        }
+      ]
+    },
+    {
+      "torch_release": "2.2.2",
+      "platform": "Windows CPU",
+      "passed": 33,
+      "skipped": 17,
+      "failed": 0,
+      "junit_sha256": "7f1045ae149bfbfaece378dc1b3cb4588555bd240d6c33d91c172b6b254b784e",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        }
+      ]
+    },
+    {
+      "torch_release": "2.3.1",
+      "platform": "Windows CPU",
+      "passed": 33,
+      "skipped": 17,
+      "failed": 0,
+      "junit_sha256": "37c651099c86c8b12a4d7bc438e8ead73e9ee3e113646aef1a03ee54f3084e66",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "skipped",
+          "skip_reason": "PyTorch lacks native custom-op APIs"
+        }
+      ]
+    },
+    {
+      "torch_release": "2.4.1",
+      "platform": "Windows CPU",
+      "passed": 50,
+      "skipped": 0,
+      "failed": 0,
+      "junit_sha256": "6ac9a4e6c6df31e27295fff968f6da838c7e82a6057fb21dd53cd14bba6bcd69",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        }
+      ]
+    },
+    {
+      "torch_release": "2.5.1",
+      "platform": "Windows CPU",
+      "passed": 50,
+      "skipped": 0,
+      "failed": 0,
+      "junit_sha256": "6b880860766b654518ab1bce4700cd4264cce5864bca9fad5903d8b28e2dbb04",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        }
+      ]
+    },
+    {
+      "torch_release": "2.6.0",
+      "platform": "Windows CPU",
+      "passed": 50,
+      "skipped": 0,
+      "failed": 0,
+      "junit_sha256": "0795256393f224b76e62e37ee4219aebc05a7c69c8a55d04304d0c1048c71675",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        }
+      ]
+    },
+    {
+      "torch_release": "2.7.1",
+      "platform": "Windows CPU",
+      "passed": 50,
+      "skipped": 0,
+      "failed": 0,
+      "junit_sha256": "ac00f71fa7e52ccb169667d1a911146fde035aec4624c31f75c508a260487b4a",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        }
+      ]
+    },
+    {
+      "torch_release": "2.8.0",
+      "platform": "Windows CPU",
+      "passed": 50,
+      "skipped": 0,
+      "failed": 0,
+      "junit_sha256": "b75750335798dc9818fddf3ec30e83c1a2ebf033b892dd77c3b8dc9fc3694a1b",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        }
+      ]
+    },
+    {
+      "torch_release": "2.9.0",
+      "platform": "Windows CPU",
+      "passed": 50,
+      "skipped": 0,
+      "failed": 0,
+      "junit_sha256": "122b5b0dbb9f9e4fb1e48becc3762205ed1d7d78b790437167914d75ebcf409d",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        }
+      ]
+    },
+    {
+      "torch_release": "2.10.0",
+      "platform": "Windows CPU",
+      "passed": 50,
+      "skipped": 0,
+      "failed": 0,
+      "junit_sha256": "a47bd0c511761a9ea68786b416aee8c3229d7de99af15b56fc034800ac98a5c9",
+      "tests": [
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        }
+      ]
+    },
+    {
+      "torch_release": "2.11.0",
+      "platform": "Windows CPU",
+      "passed": 50,
+      "skipped": 0,
+      "failed": 0,
+      "junit_sha256": "e027457a8e5f2bde2c7268ed75a68fcfd8e05b143cb397dce4df05534988a8fb",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        }
+      ]
+    },
+    {
+      "torch_release": "2.12.1",
+      "platform": "Windows CPU",
+      "passed": 50,
+      "skipped": 0,
+      "failed": 0,
+      "junit_sha256": "0e6e1788b306c5a46d5bff859c8d30035079f511a3b252afc1f29a7b86bd3a7b",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        }
+      ]
+    },
+    {
+      "torch_release": "2.13.0",
+      "platform": "Windows CPU",
+      "passed": 50,
+      "skipped": 0,
+      "failed": 0,
+      "junit_sha256": "63c844750a4eee95e8bb8ad2fca0fe4dfb66dbca74110b7c64ce51b1dd4afea6",
+      "tests": [
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        }
+      ]
+    },
+    {
+      "torch_release": "2.14.1",
+      "platform": "Windows CPU",
+      "passed": 50,
+      "skipped": 0,
+      "failed": 0,
+      "junit_sha256": "3c169654579c98ae133095cd0c3422e22dcbf4331d36e04ce042ba48d5d46f22",
+      "tests": [
+        {
+          "name": "test_native_version_training[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype0-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype1-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype2-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_training[dtype3-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_native_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[auto-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-1]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-3]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_geometry_gradients[torch-5]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype0-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype1-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype2-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype3-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype4-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-2]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_dtypes[dtype5-4]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[zeros]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[reflect]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[replicate]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_padding[circular]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[script]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_serialization[trace]",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_second_derivatives",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_forward_ad",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_func_jvp",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_native_guard_and_diagnostics",
+          "outcome": "passed",
+          "skip_reason": null
+        },
+        {
+          "name": "test_version_onnx_runtime",
+          "outcome": "passed",
+          "skip_reason": null
+        }
+      ]
+    }
+  ],
+  "source_sha256": {
+    "src/torch_convnd/benchmark.py": "fac28e16d6b12e9b1e5c607aaba86a2dfab412e941fcc99d416466157a022a9b",
+    "src/torch_convnd/convnd.py": "5513e2530454ee445a21cee0c58007d5e4093500415c59003afbe5580d123ae3",
+    "src/torch_convnd/diagnostics.py": "e9b8a6b09587760753878596d30901e07721cb0cdc1b25a0e45c9623862b84ad",
+    "src/torch_convnd/functional.py": "7de888a04414c713c8fcb69ab53374e89d107d9f903f17ad101fd45cea63f196",
+    "src/torch_convnd/modules.py": "f05170592f8c292e114414e34de800b6a742bcb4d5f9d08e5c9a58cf62fd9da7",
+    "src/torch_convnd/onnx.py": "a8e8d99dcfb804572101ddbe759f7d56388d27955b4359eda7dc07e4ffc22692",
+    "src/torch_convnd/py.typed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/torch_convnd/_autograd.py": "8ef41fa8f12b274ceae90e1a51fe787b3b9015df05d3ab6878da72e9abc344a2",
+    "src/torch_convnd/_build.py": "6dfa2faf0eabbcf71c64b2f5f3a60023acbae167e85cc1cbc4e620277b4eded1",
+    "src/torch_convnd/_compat.py": "273c8ea363bbaaf6b7ecc087dcaf685576441ea2919d971733692e6144640bf6",
+    "src/torch_convnd/_decomposition.py": "afba92ad05613793b578a9b1626989d4946b387af9a67c5afcddb6410a2c0943",
+    "src/torch_convnd/_dispatch.py": "004ccbee27dbb62f54a44c4c712ef6d99379f92bd2a8f15d69ff13540c5012c0",
+    "src/torch_convnd/_functional.py": "9b2ddc4038c8b439e157f35aa246b08f360b8c878aa455bc6c250eadfcfee8f3",
+    "src/torch_convnd/_geometry.py": "aaae4627ba1e7d0405f0eb947f94f00bf1839b5042f2af4c9584c4a2802950a8",
+    "src/torch_convnd/_layout.py": "662bba461c51dd3e93e09486c675eef8857c37abd768e0899d81cc45554283f8",
+    "src/torch_convnd/_legacy_script.py": "3d41cbf924f0b2d3447dd5798033a446f80d8c95518ea6a877be9d0dbbd4d7b0",
+    "src/torch_convnd/_operators.py": "0becf85b90ad435b85c67ea2bdecae2f840d02e56eda4c431914db871b5b3a7b",
+    "src/torch_convnd/_padding.py": "c154c009afa499d5abdf600fefb2137476d055a1f899ff260c44db87dcb3b596",
+    "src/torch_convnd/_script.py": "886b142ae6207b1be3a4b1b1ff0e377f4ea30cf6643e4b999855bc4b7cdc3532",
+    "src/torch_convnd/_toolchain.py": "4d66d44d5043ea9ccc82388f2fa936437a6480aaa4b1019b6b4493ee9c46e8fe",
+    "src/torch_convnd/_version.py": "75221487f0e0ae79d4d85082a78cee5b846b1722bf04f339662a6b7861770a60",
+    "src/torch_convnd/__init__.py": "549706203df99677df2f75a7c07993017addcbd81d7f58820272e6123c03886c",
+    "src/torch_convnd/__init__.pyi": "095b4b025ddbef6099378243af6164263d5d1ffece72b8524f5e9d3fbd9dbd48",
+    "src/torch_convnd/__main__.py": "272324caf02176f15b7fe575cbb93043be043f4ea7b6b5e548e3e24ca459367c",
+    "src/torch_convnd/csrc/convnd.cpp": "77e79036a1a781390ffe6367307855f543b4d72a105c8668cac6ac0c4601d8ac",
+    "src/torch_convnd/csrc/convnd.h": "65579d1be1a6ec2163191f37298e2df6ff3256dfa05c617c1926c6caf05949e0",
+    "src/torch_convnd/csrc/convnd_cuda.cu": "4fbf48b24b3bde32a3abeb402e03cb0f5acd93d5d1f2a8d5e94344f8e3092dab",
+    "src/torch_convnd/csrc/convnd_mixed.cpp": "afbb6df260d6ef5a55a8634b9d935fb289d0f6bfc59948f815a55a80383b56cf",
+    "tests/conftest.py": "12db74a9da50fca26f1203cd9a754985774d71771171bfa93cc5d4b401dcea47",
+    "tests/test_compilation.py": "b8b47a14460b31d0eb4203f6c40b20b6b570ae7a2b821f28d9156feeed955002",
+    "tests/test_convnd.py": "f64d0d62f8dc27beff412a05bf0b513063bbb63f4c13becee9c0da8eb5342485",
+    "tests/test_correctness_properties.py": "d2029b949a66fccb60a99870d9b55f31568bce9e07fd51feb680d4e7d49b534b",
+    "tests/test_integration.py": "f1595b9484b63cd409a5d183e511c0216397427fa0fcfd15b99ad92b440f7b66",
+    "tests/test_native_compatibility.py": "240e01b1432d9aa4cb77dc30f94ee7fb92b67546778806cc09fde61cfe0a6b02",
+    "tests/test_onnx.py": "9eae809229ce111ba055d6b867a2ec92a3817e6743cb8d5a8a40d5f2a02263d4",
+    "tests/test_packaging.py": "7397e5faf926c86ae8c9bca16fd40e010c1bcaa7d1a30300de39ef1f06fdb534",
+    "tests/test_parity.py": "1cddeba7e0ec318fdbdbd6bc5fd4bf5f19afd7f7a09eea4c64fed9537de728a7",
+    "tests/test_transform_combinations.py": "4a0405e746a959578b1a7adb081edd324178a27761324d85d1b4dd0638e88ef3",
+    "tests/test_version_compatibility.py": "32cf2107170ce70bab4e231396327275046114cc7e3fa8114de90904943e0b98",
+    "tests/typing/consumer.py": "4a772899cb055090a87e61793121b3a02585f74e50ea123aa606c1d58d9ab5c8"
+  }
+}

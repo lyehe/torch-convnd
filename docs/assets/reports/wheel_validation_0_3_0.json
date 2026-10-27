@@ -1,0 +1,52 @@
+{
+  "version": "0.3.0",
+  "isolated_python": true,
+  "wheel": {
+    "path": ".artifacts/dist/torch_convnd-0.3.0-py3-none-any.whl",
+    "sha256": "eeff2c9b2277be182e520b2bfe611de25dd643deec6ff549e01df3103793f571",
+    "all_sources_match_conformance": true
+  },
+  "full_suite": {
+    "passed": 997,
+    "failed": 0,
+    "skipped": 0,
+    "report": "parity_0_3_0_final.json"
+  },
+  "installed_wheel_checks": {
+    "cpu": {
+      "version": "0.3.0",
+      "package_path": "C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\Lib\\site-packages\\torch_convnd\\__init__.py",
+      "torch": "2.10.0+cu130",
+      "device": "cpu",
+      "native_cuda_enabled": false,
+      "checks": {
+        "isolated_wheel_import": "passed",
+        "native_build_and_fp64_training": "passed",
+        "aot_compilation": "passed",
+        "script_save_load_jvp": "passed",
+        "trace_save_load_jvp": "passed",
+        "amp_training": "passed",
+        "complex_training": "passed",
+        "onnx_runtime_4d": "passed"
+      }
+    },
+    "cuda": {
+      "version": "0.3.0",
+      "package_path": "C:\\Users\\jenkinslab\\project\\torch-convnd\\.venv\\Lib\\site-packages\\torch_convnd\\__init__.py",
+      "torch": "2.10.0+cu130",
+      "device": "cuda",
+      "native_cuda_enabled": true,
+      "checks": {
+        "isolated_wheel_import": "passed",
+        "native_build_and_fp64_training": "passed",
+        "aot_compilation": "passed",
+        "script_save_load_jvp": "passed",
+        "trace_save_load_jvp": "passed",
+        "amp_training": "passed",
+        "complex_training": "passed",
+        "onnx_runtime_4d": "passed"
+      }
+    }
+  },
+  "limits": "Windows CPU/CUDA verification; Linux CI is configured but has not been run here."
+}
