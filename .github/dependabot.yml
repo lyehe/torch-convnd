@@ -8,6 +8,13 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    ignore:
+      # Keep the legacy extra compatible with PyTorch wheels built against NumPy 1.x.
+      - dependency-name: numpy
+        update-types: ["version-update:semver-major"]
+      # Python 3.10 cannot use the mkdocstrings fix required by pymdown 12.2+.
+      - dependency-name: pymdown-extensions
+        update-types: ["version-update:semver-major"]
     groups:
       development:
         dependency-type: development
