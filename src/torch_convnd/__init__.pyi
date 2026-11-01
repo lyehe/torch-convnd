@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from os import PathLike
-from typing import Any, Literal
+from typing import Any, Literal, NamedTuple, overload
 
 import torch
 from torch import Tensor, nn
@@ -72,6 +72,92 @@ class Conv2d(_FixedConvNd): ...
 class Conv3d(_FixedConvNd): ...
 class Conv4d(_FixedConvNd): ...
 
+class PartialConvOutput(NamedTuple):
+    output: Tensor
+    mask: Tensor
+
+class PartialConvNd(ConvNd):
+    multi_channel: bool
+    return_mask: bool
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: _Spatial,
+        stride: _Spatial = ...,
+        padding: _Padding = ...,
+        dilation: _Spatial = ...,
+        groups: int = ...,
+        bias: bool = ...,
+        padding_mode: str = ...,
+        device: _Device = ...,
+        dtype: torch.dtype | None = ...,
+        *,
+        dimensions: int,
+        workspace_bytes: int = ...,
+        backend: _Backend = ...,
+        multi_channel: bool = ...,
+        return_mask: bool = ...,
+    ) -> None: ...
+    @overload  # type: ignore[override]
+    def forward(
+        self,
+        input: Tensor,
+        mask: Tensor | None = ...,
+        *,
+        mask_in: Tensor | None = ...,
+        return_mask: Literal[True],
+    ) -> PartialConvOutput: ...
+    @overload
+    def forward(
+        self,
+        input: Tensor,
+        mask: Tensor | None = ...,
+        *,
+        mask_in: Tensor | None = ...,
+        return_mask: Literal[False],
+    ) -> Tensor: ...
+    @overload
+    def forward(
+        self,
+        input: Tensor,
+        mask: Tensor | None = ...,
+        *,
+        mask_in: Tensor | None = ...,
+        return_mask: None = ...,
+    ) -> Tensor | PartialConvOutput: ...
+
+class _FixedPartialConvNd(PartialConvNd):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: _Spatial,
+        stride: _Spatial = ...,
+        padding: _Padding = ...,
+        dilation: _Spatial = ...,
+        groups: int = ...,
+        bias: bool = ...,
+        padding_mode: str = ...,
+        device: _Device = ...,
+        dtype: torch.dtype | None = ...,
+        *,
+        workspace_bytes: int = ...,
+        backend: _Backend = ...,
+        multi_channel: bool = ...,
+        return_mask: bool = ...,
+    ) -> None: ...
+
+class PartialConv1d(_FixedPartialConvNd): ...
+class PartialConv2d(_FixedPartialConvNd): ...
+class PartialConv3d(_FixedPartialConvNd): ...
+class PartialConv4d(_FixedPartialConvNd): ...
+
+class PartialSequential(nn.Sequential):
+    def forward(  # type: ignore[override]
+        self, input: Tensor, mask: Tensor | None = ...
+    ) -> PartialConvOutput: ...
+
 def conv_nd(
     input: Tensor,
     weight: Tensor,
@@ -85,6 +171,21 @@ def conv_nd(
     workspace_bytes: int = ...,
     backend: _Backend = ...,
 ) -> Tensor: ...
+def partial_conv_nd(
+    input: Tensor,
+    weight: Tensor,
+    bias: Tensor | None = ...,
+    stride: _Spatial = ...,
+    padding: _Padding = ...,
+    dilation: _Spatial = ...,
+    groups: int = ...,
+    *,
+    mask: Tensor | None = ...,
+    multi_channel: bool = ...,
+    padding_mode: str = ...,
+    workspace_bytes: int = ...,
+    backend: _Backend = ...,
+) -> PartialConvOutput: ...
 def load_native(*, with_cuda: bool | None = ..., verbose: bool = ...) -> None: ...
 def export_onnx(
     model: Any,

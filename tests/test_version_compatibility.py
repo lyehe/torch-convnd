@@ -6,7 +6,16 @@ import itertools
 import pytest
 import torch
 
-from torch_convnd import Conv4d, ConvNd, conv_nd, export_onnx, get_runtime_info
+from torch_convnd import (
+    Conv4d,
+    ConvNd,
+    PartialConvNd,
+    PartialSequential,
+    conv_nd,
+    export_onnx,
+    get_runtime_info,
+    partial_conv_nd,
+)
 from torch_convnd._compat import HAS_NATIVE_AUTOGRAD
 
 pytestmark = pytest.mark.portable
@@ -73,6 +82,95 @@ def test_version_geometry_gradients(rank, backend):
     second = torch.autograd.grad(expected, (input, weight, bias), cotangent)
     for value, target in zip(first, second, strict=True):
         torch.testing.assert_close(value, target, atol=1e-9, rtol=1e-9)
+
+
+def partial_reference(input, mask, weight, bias, padding, groups, multi_channel):
+    """NVIDIA's partial convolution built from the independent reference above."""
+    rank, per_group = input.ndim - 2, weight.shape[1]
+    width = input.shape[1] if multi_channel else 1
+    if mask is None:
+        mask = torch.ones((input.shape[0], width) + tuple(input.shape[2:]), dtype=input.dtype)
+    updater = torch.ones(
+        (weight.shape[0] if multi_channel else 1, per_group if multi_channel else 1)
+        + tuple(weight.shape[2:]),
+        dtype=input.dtype,
+    )
+    count = reference(mask, updater, None, padding=padding, groups=groups if multi_channel else 1)
+    window = updater[0].numel()
+    update = count.clamp(0, 1)
+    ratio = torch.where(count > 0, window / count.clamp_min(1e-300), torch.zeros_like(count))
+    raw = reference(input * mask, weight, None, padding=padding, groups=groups)
+    view = bias.reshape(1, -1, *((1,) * rank))
+    return (raw * ratio * update + view) * update, update
+
+
+@pytest.mark.parametrize("rank", [2, 4])
+@pytest.mark.parametrize("multi_channel", [False, True])
+@pytest.mark.parametrize("masked", [False, True])
+def test_version_partial_convolution(rank, multi_channel, masked):
+    """Values, update masks and gradients on the mask-free and masked paths."""
+    generator = torch.Generator().manual_seed(707 + rank)
+    input = torch.randn((2, 4) + (4,) * rank, dtype=torch.float64, generator=generator)
+    weight = torch.randn((4, 2) + (3,) * rank, dtype=torch.float64, generator=generator)
+    bias = torch.randn(4, dtype=torch.float64, generator=generator)
+    mask = None
+    if masked:
+        shape = (2, 4 if multi_channel else 1) + (4,) * rank
+        mask = (torch.rand(shape, generator=generator) > 0.3).double()
+    leaves = [value.clone().requires_grad_() for value in (input, weight, bias)]
+    actual, update = partial_conv_nd(
+        *leaves, padding=1, groups=2, mask=mask, multi_channel=multi_channel, backend="torch"
+    )
+    expected, expected_update = partial_reference(
+        *leaves[:1], mask, *leaves[1:], (1,) * rank, 2, multi_channel
+    )
+    torch.testing.assert_close(actual, expected, atol=1e-9, rtol=1e-9)
+    torch.testing.assert_close(update, expected_update.expand_as(update))
+    cotangent = torch.randn(actual.shape, dtype=torch.float64, generator=generator)
+    first = torch.autograd.grad(actual, leaves, cotangent)
+    second = torch.autograd.grad(expected, leaves, cotangent)
+    for value, target in zip(first, second, strict=True):
+        torch.testing.assert_close(value, target, atol=1e-9, rtol=1e-9)
+    layer = PartialConvNd(
+        4,
+        4,
+        3,
+        padding=1,
+        groups=2,
+        dimensions=rank,
+        multi_channel=multi_channel,
+        backend="torch",
+        dtype=torch.float64,
+    )
+    layer.load_state_dict({"weight": weight, "bias": bias})
+    torch.testing.assert_close(layer(input, mask), expected.detach(), atol=1e-9, rtol=1e-9)
+
+
+def test_version_partial_padding_and_chaining():
+    """padding_mode='partial' and PartialSequential follow the same reference."""
+    generator = torch.Generator().manual_seed(808)
+    input = torch.randn((2, 4) + (4,) * 4, dtype=torch.float64, generator=generator)
+    weight = torch.randn((4, 2) + (3,) * 4, dtype=torch.float64, generator=generator)
+    bias = torch.randn(4, dtype=torch.float64, generator=generator)
+    padding = (1,) * 4
+    expected, _ = partial_reference(input, None, weight, bias, padding, 2, False)
+    options = {"padding": 1, "groups": 2, "dimensions": 4, "backend": "torch"}
+    bordered = ConvNd(4, 4, 3, padding_mode="partial", dtype=torch.float64, **options)
+    bordered.load_state_dict({"weight": weight, "bias": bias})
+    torch.testing.assert_close(bordered(input), expected, atol=1e-9, rtol=1e-9)
+    functional = conv_nd(input, weight, bias, padding=1, groups=2, padding_mode="partial")
+    torch.testing.assert_close(functional, expected, atol=1e-9, rtol=1e-9)
+    layers = [PartialConvNd(4, 4, 3, dtype=torch.float64, **options) for _ in range(2)]
+    for layer in layers:
+        layer.load_state_dict({"weight": weight, "bias": bias})
+    mask = (torch.rand((2, 1) + (4,) * 4, generator=generator) > 0.3).double()
+    output, final = PartialSequential(layers[0], torch.nn.ReLU(), layers[1])(input, mask)
+    hidden, update = partial_reference(input, mask, weight, bias, padding, 2, False)
+    expected, expected_final = partial_reference(
+        hidden.relu(), update, weight, bias, padding, 2, False
+    )
+    torch.testing.assert_close(output, expected, atol=1e-9, rtol=1e-9)
+    torch.testing.assert_close(final, expected_final)
 
 
 @pytest.mark.parametrize("rank", [2, 4])
@@ -196,3 +294,35 @@ def test_version_onnx_runtime(tmp_path):
     session = runtime.InferenceSession(str(path), options, providers=["CPUExecutionProvider"])
     actual = torch.from_numpy(session.run(None, {session.get_inputs()[0].name: input.numpy()})[0])
     torch.testing.assert_close(actual, layer(input), atol=2e-5, rtol=2e-5)
+
+
+@pytest.mark.parametrize("masked", [False, True], ids=["mask_free", "masked"])
+def test_version_partial_onnx_runtime(masked, tmp_path):
+    """Partial layers export with every argument and their update masks, on every exporter."""
+    pytest.importorskip("onnx")
+    runtime = pytest.importorskip("onnxruntime")
+    generator = torch.Generator().manual_seed(909)
+    layer = PartialConvNd(
+        4,
+        6,
+        3,
+        padding=1,
+        groups=2,
+        dimensions=2,
+        multi_channel=True,
+        return_mask=True,
+        backend="torch",
+    ).eval()
+    input = torch.randn((2, 4, 6, 7), generator=generator)
+    mask = (torch.rand((2, 4, 6, 7), generator=generator) > 0.3).float()
+    arguments = (input, mask) if masked else (input,)
+    path = tmp_path / "partial.onnx"
+    export_onnx(layer, arguments, path, external_data=False)
+    session = runtime.InferenceSession(str(path), providers=["CPUExecutionProvider"])
+    names = [value.name for value in session.get_inputs()]
+    feed = {name: value.numpy() for name, value in zip(names, arguments, strict=True)}
+    output, update = session.run(None, feed)
+    with torch.no_grad():
+        expected = layer(*arguments)
+    torch.testing.assert_close(torch.from_numpy(output), expected.output, atol=2e-5, rtol=2e-5)
+    torch.testing.assert_close(torch.from_numpy(update), expected.mask.contiguous())

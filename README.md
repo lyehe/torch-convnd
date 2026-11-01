@@ -138,12 +138,60 @@ model = nn.Sequential(
 - Inputs: `[batch, channels, *spatial]` or `[channels, *spatial]`.
 - Weights: `[out_channels, in_channels // groups, *kernel]`.
 - Stock-style groups, bias, per-axis stride/dilation, numeric/`same`/`valid`
-  padding, and zeros/reflect/replicate/circular modes.
+  padding, and zeros/reflect/replicate/circular modes, plus `partial` border rescaling.
 - CPU/CUDA real and complex types, higher derivatives, transforms and serialization.
 - Standard state-dictionary keys for the 1D/2D/3D wrappers; typed public API and `py.typed`.
 
 See the [integration guide](docs/integration.md), [API reference](docs/api.md),
 and [framework-independent training example](examples/integration.py).
+
+## Partial convolution
+
+NVIDIA's [partial convolution](https://github.com/NVIDIA/partialconv) convolves only
+valid samples and rescales each window by its size over its valid count. It works at
+any rank and on every backend, in three forms:
+
+- **Border correction:** `padding_mode="partial"` on `ConvNd`, `Conv1d`–`Conv4d` or
+  `conv_nd` is zero padding with border windows rescaled for their padded taps. The
+  weights, state dictionary and call signature stay those of an ordinary layer.
+- **Masked layers:** `PartialConvNd` and `PartialConv1d`–`PartialConv4d` take
+  `forward(input, mask=None)`, and with `return_mask=True` also return the update mask
+  as `PartialConvOutput(output, mask)`.
+- **Chains:** `PartialSequential` carries the mask through partial layers and the
+  activations or normalization between them, and returns `PartialConvOutput`.
+
+```python
+import torch
+from torch import nn
+from torch_convnd import Conv3d, PartialConv4d, PartialSequential
+
+border = Conv3d(2, 8, 3, padding=1, padding_mode="partial")  # no mask needed
+
+x = torch.randn(1, 2, 4, 4, 4, 8)
+mask = (torch.rand(1, 2, 4, 4, 4, 8) > 0.3).float()  # 1 = valid, 0 = hole
+layer = PartialConv4d(2, 8, 3, padding=1, multi_channel=True)
+y, update = layer(x, mask, return_mask=True)  # update: valid outputs, for the next layer
+
+network = PartialSequential(
+    layer, nn.ReLU(), PartialConv4d(8, 1, 3, padding=1, multi_channel=True)
+)
+y, final = network(x, mask)
+```
+
+A mask has the input's dimensions, with one channel shared by every input channel or,
+with `multi_channel=True`, one per input channel; batch and spatial sizes of 1
+broadcast. Any real dtype works: 1 marks a valid sample, 0 a hole, and fractional
+values follow NVIDIA's formula. Masks are padded like the input: zero padding adds
+holes, and copying padding modes copy validity along with values. The update mask has
+one channel, or `out_channels` with `multi_channel`, so it feeds the next partial
+layer directly; it may be a broadcast view, so clone it before writing in place.
+The arithmetic follows NVIDIA's code, with grouped counts per group. Counts stay exact
+under AMP, and the rescale moves to float32 when a window is larger than the output
+dtype can represent. `partial_conv_nd` is the functional form. Modules also accept
+NVIDIA's `mask_in=`, and `return_mask` set at construction is a default each call can
+override. Without a mask a layer costs about as much as an ordinary convolution:
+copying padding modes run one, and zero padding rescales from exact per-axis counts
+in a single fused pass.
 
 ## Compatibility and performance
 
