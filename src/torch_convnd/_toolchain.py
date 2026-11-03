@@ -4,20 +4,27 @@ import importlib.util
 import os
 import shutil
 import sys
+import sysconfig
 from functools import cache
 
 import torch
 
 from ._compat import HAS_NATIVE_AUTOGRAD, assume_constant_result
 
+# vcvarsall.bat targets for the interpreter's platform; ARM64 uses its native toolset.
+_VCVARS_SPEC = {"win-amd64": "x86_amd64", "win-arm64": "arm64"}
+
 
 def msvc_environment():
-    """Locate the MSVC helper across PyTorch/setuptools layouts."""
+    """Locate the MSVC helper across PyTorch/setuptools layouts.
+
+    The addon must match the interpreter, so the target follows its platform.
+    """
     try:
         from torch.utils.cpp_extension import _get_vc_env
     except ImportError:
         from setuptools._distutils._msvccompiler import _get_vc_env
-    return _get_vc_env("x86_amd64")
+    return _get_vc_env(_VCVARS_SPEC.get(sysconfig.get_platform(), "x86_amd64"))
 
 
 @assume_constant_result

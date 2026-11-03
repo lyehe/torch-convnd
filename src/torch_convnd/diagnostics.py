@@ -3,6 +3,7 @@
 import argparse
 import json
 import platform
+import sys
 from typing import Any
 
 import torch
@@ -13,17 +14,34 @@ from ._toolchain import native_unavailable_reason
 from ._version import __version__
 
 
+def _processor() -> str:
+    """Name the CPU model: vendor kernels, and their defects, vary with it."""
+    try:
+        with open("/proc/cpuinfo", encoding="utf-8") as cpuinfo:
+            for line in cpuinfo:
+                if line.startswith("model name"):
+                    return line.partition(":")[2].strip()
+    except OSError:
+        pass
+    return platform.processor()
+
+
 def get_runtime_info() -> dict[str, Any]:
     """Describe versions and backend prerequisites without compiling or allocating GPU tensors."""
     cuda = torch.cuda.is_available()
     mps = getattr(torch.backends, "mps", None)
+    cpu = getattr(torch.backends, "cpu", None)
     cpu_reason = native_unavailable_reason("cpu")
     cuda_reason = native_unavailable_reason("cuda") if cuda else "CUDA runtime is unavailable."
     return {
         "torch_convnd": __version__,
         "python": platform.python_version(),
+        # False only on a free-threaded interpreter whose imports kept the GIL disabled.
+        "gil_enabled": getattr(sys, "_is_gil_enabled", lambda: True)(),
         "platform": platform.system(),
         "machine": platform.machine(),
+        "processor": _processor(),
+        "cpu_capability": cpu.get_cpu_capability() if hasattr(cpu, "get_cpu_capability") else None,
         "torch": str(torch.__version__),
         "cuda_runtime": torch.version.cuda,
         "rocm_runtime": torch.version.hip,

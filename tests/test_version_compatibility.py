@@ -1,5 +1,6 @@
 """Core adoption contract exercised independently on old and current PyTorch."""
 
+import inspect
 import io
 import itertools
 
@@ -61,6 +62,21 @@ def reference(input, weight, bias, stride=None, padding=None, dilation=None, gro
     return result if bias is None else result + bias.reshape(1, -1, *((1,) * rank))
 
 
+def stock_conv3d_error(batch, stride, padding, dilation):
+    """Largest gradient error of stock grouped conv3d against the reference."""
+    generator = torch.Generator().manual_seed(506)
+    input = torch.randn((batch, 2, 3, 3, 3), dtype=torch.float64, generator=generator)
+    weight = torch.randn((4, 1, 2, 2, 2), dtype=torch.float64, generator=generator)
+    leaves = [input.requires_grad_(), weight.requires_grad_()]
+    geometry = {"stride": stride, "padding": padding, "dilation": dilation, "groups": 2}
+    actual = torch.nn.functional.conv3d(*leaves, None, **geometry)
+    cotangent = torch.randn(actual.shape, dtype=torch.float64, generator=generator)
+    first = torch.autograd.grad(actual, leaves, cotangent)
+    second = torch.autograd.grad(reference(*leaves, None, **geometry), leaves, cotangent)
+    errors = [(value - target).abs().max() for value, target in zip(first, second, strict=True)]
+    return max(errors).item()
+
+
 @pytest.mark.parametrize("rank", [1, 2, 3, 4, 5])
 @pytest.mark.parametrize("backend", ["auto", "torch"])
 def test_version_geometry_gradients(rank, backend):
@@ -80,8 +96,18 @@ def test_version_geometry_gradients(rank, backend):
     cotangent = torch.randn_like(actual)
     first = torch.autograd.grad(actual, (input, weight, bias), cotangent)
     second = torch.autograd.grad(expected, (input, weight, bias), cotangent)
-    for value, target in zip(first, second, strict=True):
-        torch.testing.assert_close(value, target, atol=1e-9, rtol=1e-9)
+    try:
+        for value, target in zip(first, second, strict=True):
+            torch.testing.assert_close(value, target, atol=1e-9, rtol=1e-9)
+    except AssertionError:
+        # Ranks 3 and 4 run on stock conv3d (rank 4 over 2 frames). When it is wrong
+        # for the same geometry, the defect is the platform's, not this package's.
+        if rank in (3, 4):
+            tail = {key: geometry[key][-3:] for key in ("stride", "padding", "dilation")}
+            error = stock_conv3d_error(rank - 2, **tail)
+            if error > 1e-9:
+                pytest.xfail(f"stock conv3d gradients are wrong on this platform: {error:.3g}")
+        raise
 
 
 def partial_reference(input, mask, weight, bias, padding, groups, multi_channel):
@@ -219,8 +245,22 @@ def test_version_padding(mode):
     torch.testing.assert_close(layer(input), reference(padded, layer.weight, layer.bias))
 
 
+def scripts_stock_modules():
+    """TorchScript reads ``module.__annotations__``, which Python 3.14 no longer provides
+    on instances; PyTorch 2.9 cannot script even stock layers such as Linear there."""
+    try:
+        torch.jit.script(torch.nn.Linear(1, 1))
+    except AttributeError as error:
+        if "__annotations__" not in str(error):
+            raise
+        return False
+    return True
+
+
 @pytest.mark.parametrize("mode", ["script", "trace"])
 def test_version_serialization(mode):
+    if mode == "script" and not scripts_stock_modules():
+        pytest.skip("this PyTorch's TorchScript cannot script stock modules on this Python")
     layer = Conv4d(2, 3, 2, backend="torch", dtype=torch.float64)
     input = torch.randn(1, 2, 3, 3, 3, 3, dtype=torch.float64, requires_grad=True)
     compiled = torch.jit.script(layer) if mode == "script" else torch.jit.trace(layer, input)
@@ -281,13 +321,37 @@ def test_version_native_guard_and_diagnostics():
             load_native(with_cuda=False)
 
 
+def dynamo_conv_runs(runtime, directory):
+    """PyTorch 2.6's Dynamo exporter gives bias-free 3-D Conv nodes a [C, 2] zero bias.
+
+    ONNX requires a 1-D bias, and newer ONNX Runtime releases reject the graph, even
+    for a stock Conv3d; rank-4 layers decompose into such convolutions. The legacy
+    exporter is unaffected and is the documented choice there.
+    """
+    if "custom_translation_table" not in inspect.signature(torch.onnx.export).parameters:
+        return True
+    path = directory / "stock.onnx"
+    input = torch.ones(1, 1, 1, 1, 1)
+    stock = torch.nn.Conv3d(1, 1, 1, bias=False)
+    torch.onnx.export(stock, (input,), path, dynamo=True, external_data=False, verbose=False)
+    session = runtime.InferenceSession(str(path), providers=["CPUExecutionProvider"])
+    try:
+        session.run(None, {session.get_inputs()[0].name: input.numpy()})
+    except Exception as error:  # ONNX Runtime raises its own failure types
+        if "bias" not in str(error):
+            raise
+        return False
+    return True
+
+
 def test_version_onnx_runtime(tmp_path):
     pytest.importorskip("onnx")
     runtime = pytest.importorskip("onnxruntime")
     layer = Conv4d(2, 3, 2, backend="torch").eval()
     input = torch.randn(1, 2, 3, 3, 3, 3)
     path = tmp_path / "version.onnx"
-    export_onnx(layer, (input,), path, external_data=False)
+    dynamo = None if dynamo_conv_runs(runtime, tmp_path) else False
+    export_onnx(layer, (input,), path, external_data=False, dynamo=dynamo)
     options = runtime.SessionOptions()
     options.intra_op_num_threads = 2
     options.inter_op_num_threads = 1

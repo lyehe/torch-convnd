@@ -52,7 +52,15 @@ run `pytest tests/test_version_compatibility.py tests/test_native_compatibility.
 This contract compares independent values/gradients, dtypes, padding, higher
 derivatives, serialization and ONNX execution without importing missing APIs.
 Native checks skip with an explicit reason when the framework lacks the required
-custom-op APIs. The CI `versions` job checks 18 release lines on Python 3.10.
+custom-op APIs. The CI `versions` job checks the 19 release lines from 1.11 to 2.15
+on the oldest and the newest Python each supports, and the portable floor (1.11)
+and first native release (2.4) on Linux ARM64, Windows and macOS, plus the first
+Windows on Arm and the last Intel macOS releases.
+
+To check that the CUDA kernels compile and register on a machine without a GPU,
+install a CUDA build of PyTorch and a matching toolkit, then run
+`python tools/check_cuda_build.py`. It also compares the CPU kernels of that build
+with the portable path. CI runs it for the first native release and the newest.
 
 ## Archive a run
 
