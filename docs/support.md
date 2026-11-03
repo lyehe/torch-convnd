@@ -24,9 +24,9 @@ toolkit) and 2.15 (CUDA 13.2); CUDA execution needs the manual GPU workflow.
 
 Hosted macOS runners expose a paravirtualized Apple GPU. There, CI checks Apple
 MPS values and gradients for ranks 1-5 and masked partial convolution against
-float64 CPU references, with PyTorch 2.10 in the full suite and wherever a version
-contract job's PyTorch accepts the device. PyTorch 2.15 refuses it (it lacks
-Metal 2.0 support), so the current-PyTorch macOS job runs without MPS.
+float64 CPU references, with PyTorch 2.4 (version contract) and 2.10 (full suite).
+PyTorch 1.11 predates MPS, and PyTorch 2.15 refuses that device (it lacks Metal 2.0
+support), so those macOS jobs run without MPS.
 
 There is no promise that an absent framework API is emulated, or that an untested
 future release is already verified. The package has no hard upper version pin;
