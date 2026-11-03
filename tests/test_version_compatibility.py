@@ -1,5 +1,6 @@
 """Core adoption contract exercised independently on old and current PyTorch."""
 
+import inspect
 import io
 import itertools
 
@@ -219,8 +220,22 @@ def test_version_padding(mode):
     torch.testing.assert_close(layer(input), reference(padded, layer.weight, layer.bias))
 
 
+def scripts_stock_modules():
+    """TorchScript reads ``module.__annotations__``, which Python 3.14 no longer provides
+    on instances; PyTorch 2.9 cannot script even stock layers such as Linear there."""
+    try:
+        torch.jit.script(torch.nn.Linear(1, 1))
+    except AttributeError as error:
+        if "__annotations__" not in str(error):
+            raise
+        return False
+    return True
+
+
 @pytest.mark.parametrize("mode", ["script", "trace"])
 def test_version_serialization(mode):
+    if mode == "script" and not scripts_stock_modules():
+        pytest.skip("this PyTorch's TorchScript cannot script stock modules on this Python")
     layer = Conv4d(2, 3, 2, backend="torch", dtype=torch.float64)
     input = torch.randn(1, 2, 3, 3, 3, 3, dtype=torch.float64, requires_grad=True)
     compiled = torch.jit.script(layer) if mode == "script" else torch.jit.trace(layer, input)
@@ -281,13 +296,37 @@ def test_version_native_guard_and_diagnostics():
             load_native(with_cuda=False)
 
 
+def dynamo_conv_runs(runtime, directory):
+    """PyTorch 2.6's Dynamo exporter gives bias-free 3-D Conv nodes a [C, 2] zero bias.
+
+    ONNX requires a 1-D bias, and newer ONNX Runtime releases reject the graph, even
+    for a stock Conv3d; rank-4 layers decompose into such convolutions. The legacy
+    exporter is unaffected and is the documented choice there.
+    """
+    if "custom_translation_table" not in inspect.signature(torch.onnx.export).parameters:
+        return True
+    path = directory / "stock.onnx"
+    input = torch.ones(1, 1, 1, 1, 1)
+    stock = torch.nn.Conv3d(1, 1, 1, bias=False)
+    torch.onnx.export(stock, (input,), path, dynamo=True, external_data=False, verbose=False)
+    session = runtime.InferenceSession(str(path), providers=["CPUExecutionProvider"])
+    try:
+        session.run(None, {session.get_inputs()[0].name: input.numpy()})
+    except Exception as error:  # ONNX Runtime raises its own failure types
+        if "bias" not in str(error):
+            raise
+        return False
+    return True
+
+
 def test_version_onnx_runtime(tmp_path):
     pytest.importorskip("onnx")
     runtime = pytest.importorskip("onnxruntime")
     layer = Conv4d(2, 3, 2, backend="torch").eval()
     input = torch.randn(1, 2, 3, 3, 3, 3)
     path = tmp_path / "version.onnx"
-    export_onnx(layer, (input,), path, external_data=False)
+    dynamo = None if dynamo_conv_runs(runtime, tmp_path) else False
+    export_onnx(layer, (input,), path, external_data=False, dynamo=dynamo)
     options = runtime.SessionOptions()
     options.intra_op_num_threads = 2
     options.inter_op_num_threads = 1

@@ -76,6 +76,17 @@ unavailable. Other versions/providers may differ. Complex tensor interfaces are
 outside the [ONNX Conv schema](https://onnx.ai/onnx/operators/onnx__Conv.html);
 provide an explicit real/imaginary model interface when required.
 
+Two upstream defects are tied to specific releases, and the version contract
+detects both rather than hiding them:
+
+- PyTorch 2.6's Dynamo exporter gives every bias-free 3-D convolution, stock
+  `Conv3d` included, a `[C_out, 2]` zero bias. ONNX requires a 1-D bias, and ONNX
+  Runtime 1.31 rejects the graph (1.23 ignored it). Rank-4 and higher layers
+  decompose into such convolutions, so on 2.6 export with `dynamo=False`.
+- On Python 3.14, TorchScript in PyTorch 2.9 cannot script modules at all, stock
+  `Linear` included: it reads `__annotations__` from instances, which Python 3.14
+  no longer provides. Use PyTorch 2.10 or later to script on Python 3.14.
+
 Default rank-2/3 vendor paths inherit PyTorch's empty-vmap behavior and layout
 selection. The raw native rule preserves the logical inner batch for empty maps;
 native output strides can differ while values/gradients agree. cuDNN settings

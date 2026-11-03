@@ -30,7 +30,12 @@
   export on every tested PyTorch release.
 - Build the native addon on Windows on Arm: the MSVC environment now targets the
   interpreter's platform, using the ARM64 toolset there, instead of always x64.
-- Report whether the GIL is enabled in `torch-convnd-info`.
+- Report the CPU model, ATen's CPU capability and whether the GIL is enabled in
+  `torch-convnd-info`.
+- Document, and detect in the version contract, two upstream defects: PyTorch 2.6's
+  Dynamo exporter writes an invalid zero bias for bias-free 3-D convolutions (export
+  with `dynamo=False` there), and PyTorch 2.9's TorchScript cannot script modules on
+  Python 3.14.
 - Broaden CI to PyTorch 2.15 and Python 3.15. The version contract runs every
   release line from 1.11 on the oldest and the newest Python it supports, and the
   portable and native floors on Linux ARM64, Windows, macOS, Windows on Arm and
