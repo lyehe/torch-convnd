@@ -6,11 +6,13 @@ tensors included, is checked:
     LD_PRELOAD="$(gcc -print-file-name=libasan.so) $(gcc -print-file-name=libubsan.so)" \
     ASAN_OPTIONS=detect_leaks=0 python tools/sanitize_native.py tests/test_native_compatibility.py
 
-Any out-of-bounds access, use after free or undefined behavior in the addon aborts.
+Any out-of-bounds access, use after free or undefined behavior in the addon aborts. The
+run fails unless the tests built the sanitized addon with the ASan runtime loaded.
 """
 
 import functools
 import sys
+from pathlib import Path
 
 import pytest
 import torch.utils.cpp_extension as cpp_extension
@@ -21,6 +23,7 @@ COMPILE = [SANITIZERS, "-fno-sanitize-recover=undefined", "-fno-omit-frame-point
 
 def main() -> int:
     build = cpp_extension.load
+    built = []
 
     @functools.wraps(build)
     def sanitized(*args, **kwargs):
@@ -28,11 +31,21 @@ def main() -> int:
         kwargs["name"] = f"{kwargs['name']}_sanitized"
         kwargs["extra_cflags"] = [*kwargs.get("extra_cflags", []), *COMPILE]
         kwargs["extra_ldflags"] = [*kwargs.get("extra_ldflags", []), SANITIZERS]
+        kwargs["verbose"] = True  # the compile commands show the flags in the log
+        built.append(kwargs["name"])
         return build(*args, **kwargs)
 
     # load_native imports load at call time, so it builds through this wrapper.
     cpp_extension.load = sanitized
-    return pytest.main(sys.argv[1:])
+    status = pytest.main(sys.argv[1:])
+    if not built:
+        print("No native build ran, so nothing was sanitized", file=sys.stderr)
+        return 1
+    if "libasan" not in Path("/proc/self/maps").read_text():
+        print("The ASan runtime is not loaded; preload libasan", file=sys.stderr)
+        return 1
+    print(f"Sanitized native builds: {', '.join(built)}")
+    return int(status)
 
 
 if __name__ == "__main__":
