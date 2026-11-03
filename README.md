@@ -27,7 +27,8 @@ vendor/native acceleration when available.
 ## Install
 
 Install your desired PyTorch distribution first. Python 3.10+ and PyTorch 1.11+
-are required. Install directly from the public repository:
+are required (PyTorch 2.15+ itself requires Python 3.11+). Linux, Windows and macOS
+are supported on x86_64 and ARM64. Install directly from the public repository:
 
 ```sh
 python -m pip install "git+https://github.com/lyehe/torch-convnd.git"
@@ -53,7 +54,8 @@ this repository. This checkout has not been published to PyPI. See the
 [installation guide](docs/installation.md) for deployment and toolchain details.
 
 Compatibility is selected by available APIs. The version contract is tested
-across 18 PyTorch release lines from 1.11 through 2.14.
+across 19 PyTorch release lines from 1.11 through 2.15, each on its oldest and
+newest supported Python.
 Native acceleration needs the newer custom-op/autocast APIs; older releases keep
 the same public layers through portable operations. `torch.func`, `torch.compile`
 and exporter features remain conditional on what the installed framework provides.
@@ -238,12 +240,15 @@ mkdocstrings integration. CI checks documentation on Python 3.10 and 3.12.
 Tests use stock 2D/3D layers, an independent N-D reference, generated geometries,
 finite differences and feature-combination regressions. CI also installs and
 checks built wheels in isolated Python. GPU cases skip without the required
-hardware; CUDA CI runs manually on a trusted runner.
+hardware. Hosted CI compiles and loads the CUDA kernels without a GPU; CUDA
+execution CI runs manually on a trusted runner.
 
 [Correctness evidence](docs/PARITY.md) · [Contributing](CONTRIBUTING.md) ·
 [Release process](docs/releasing.md) · [Changelog](CHANGELOG.md)
 
-CI covers Linux/Windows/macOS and minimum/current PyTorch across Python 3.10-3.14.
+CI covers Linux, Windows and macOS on x86_64 and ARM64, PyTorch 1.11-2.15 across
+Python 3.10-3.15 and free-threaded 3.14t, and runs weekly with a PyTorch nightly
+canary. Version tags publish a GitHub release with attested artifacts.
 Documentation and PyPI deployment workflows are included; their external targets
 must be configured before publishing. Nothing is published by installing this project.
 

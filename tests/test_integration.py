@@ -64,6 +64,22 @@ def test_explicit_native_missing_tools_is_actionable(monkeypatch):
         _build.load_native(with_cuda=False)
 
 
+@pytest.mark.parametrize(
+    "platform,spec", [("win-amd64", "x86_amd64"), ("win-arm64", "arm64"), ("mingw", "x86_amd64")]
+)
+def test_msvc_environment_targets_the_interpreter(platform, spec, monkeypatch):
+    """An ARM64 interpreter needs ARM64 kernels; the x64 toolset cannot build them."""
+    import torch.utils.cpp_extension as cpp_extension
+
+    from torch_convnd import _toolchain
+
+    requested = []
+    monkeypatch.setattr(_toolchain.sysconfig, "get_platform", lambda: platform)
+    monkeypatch.setattr(cpp_extension, "_get_vc_env", requested.append, raising=False)
+    _toolchain.msvc_environment()
+    assert requested == [spec]
+
+
 @pytest.mark.parametrize("factory,rank", [(Conv2d, 2), (Conv3d, 3)])
 def test_stock_state_dict_round_trip(factory, rank):
     """Existing projects can exchange parameters with stock layers without renaming keys."""

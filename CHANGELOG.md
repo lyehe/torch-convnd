@@ -28,6 +28,19 @@
   type that supports it. Both ONNX exporters handle partial layers, including dynamic
   sizes. The version-compatibility contract covers partial convolution and its ONNX
   export on every tested PyTorch release.
+- Build the native addon on Windows on Arm: the MSVC environment now targets the
+  interpreter's platform, using the ARM64 toolset there, instead of always x64.
+- Report whether the GIL is enabled in `torch-convnd-info`.
+- Broaden CI to PyTorch 2.15 and Python 3.15. The version contract runs every
+  release line from 1.11 on the oldest and the newest Python it supports, and the
+  portable and native floors on Linux ARM64, Windows, macOS, Windows on Arm and
+  Intel macOS. The full suite adds Python 3.11, 3.15 and free-threaded 3.14t, Linux
+  ARM64 and Windows on Arm. Hosted CI compiles, loads and registers the CUDA kernels
+  without a GPU for PyTorch 2.4 and 2.15 (`tools/check_cuda_build.py`), runs weekly,
+  and adds a PyTorch nightly canary to scheduled and manual runs.
+- Releases attest build provenance and publish a GitHub release with the checked
+  wheel, sdist and changelog section (`tools/release_notes.py`). The manual CUDA
+  workflow takes the PyTorch version, CUDA wheel index and Python as inputs.
 
 ## 0.5.0
 

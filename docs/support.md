@@ -1,10 +1,26 @@
 # Backends and compatibility
 
-The minimum runtime is Python 3.10 / PyTorch 1.11. The version contract checks
-every minor release line from 1.11 to 2.14, with native tests enabled by actual
-capabilities. A separate modern matrix covers Linux/Windows/macOS and selected
-Python versions 3.10-3.14. Source and CI live at
+The minimum runtime is Python 3.10 / PyTorch 1.11; PyTorch 2.15 and later
+require Python 3.11. The version contract checks every minor release line from
+1.11 to 2.15 on the oldest and the newest Python it supports, with native tests
+enabled by actual capabilities. The full suite runs on every platform below with
+its current PyTorch, across Python 3.10-3.15 and free-threaded 3.14t. CI also runs
+weekly, adding a PyTorch nightly canary. Source and CI live at
 [lyehe/torch-convnd](https://github.com/lyehe/torch-convnd).
+
+| Platform | CI runner | PyTorch checked | Native CPU addon |
+| --- | --- | --- | --- |
+| Linux x86_64 | `ubuntu-24.04`, `ubuntu-latest` | Every line 1.11-2.15; nightly | GCC, from 2.4 |
+| Linux ARM64 | `ubuntu-24.04-arm` | 1.11, 2.4, current | GCC, from 2.4 |
+| Windows x64 | `windows-latest` | 1.11, 2.4, 2.10, current | MSVC, from 2.4 |
+| Windows ARM64 | `windows-11-arm` | 2.7 (first wheels), current | MSVC ARM64 toolset |
+| macOS ARM64 | `macos-latest` | 1.11, 2.4, 2.10, current | Apple Clang, from 2.4 |
+| macOS x86_64 | `macos-15-intel` | 1.11, 2.2 (last wheels) | None: 2.2 predates the native APIs |
+
+Windows on Arm wheels are published on PyTorch's own index
+(`https://download.pytorch.org/whl/cpu`), not on PyPI. For CUDA, CI compiles,
+loads and registers the native kernels without a GPU for PyTorch 2.4 (CUDA 12.5
+toolkit) and 2.15 (CUDA 13.2); CUDA execution needs the manual GPU workflow.
 
 There is no promise that an absent framework API is emulated, or that an untested
 future release is already verified. The package has no hard upper version pin;
@@ -12,7 +28,7 @@ optional APIs are probed and portable execution avoids modern custom-op dependen
 
 | Feature | Availability policy |
 | --- | --- |
-| Dense forward/backward, higher derivatives, padding, state dictionaries | Portable core verified on 1.11-2.14 |
+| Dense forward/backward, higher derivatives, padding, state dictionaries | Portable core verified on 1.11-2.15 |
 | Script/trace | Compatible operator when available; pure Tensor script adapter otherwise |
 | `torch.func` / `torch.compile` | Only where the framework supplies the API |
 | Native autograd/fake kernels | Requires detected registration and unified-autocast APIs; CPU checked from 2.4 |
@@ -45,9 +61,12 @@ show speed and memory tradeoffs, including native workspace costs.
 The [correctness report](PARITY.md) retains historical baselines and the current
 compatibility evidence. Local hardware is Windows CPU and RTX 4090.
 Python 3.13 / PyTorch 2.14.1 CPU is additionally exercised in a separate environment.
-Linux/macOS, Apple MPS, AMD ROCm and other GPUs have not been executed locally.
-The CUDA workflow is manual and requires a trusted self-hosted runner with a
-matching toolkit. CI does not claim distributed multi-process or CUDA Graph coverage.
+Linux/macOS, Apple MPS, AMD ROCm and other GPUs have not been executed locally;
+hosted CI covers Linux and macOS on CPU only. Its CUDA build check proves that the
+kernels compile and register, not that they run. The CUDA workflow is manual and
+requires a trusted self-hosted runner with a matching toolkit; its PyTorch version,
+CUDA wheel index and Python are selectable. CI does not claim distributed
+multi-process or CUDA Graph coverage.
 
 ## Export and reference differences
 

@@ -4,11 +4,19 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    # Weekly, so new PyTorch releases and runner images are checked between changes.
+    - cron: '23 4 * * 1'
   workflow_dispatch:
   workflow_call:
 
 permissions:
   contents: read
+
+concurrency:
+  # A newer push to a pull request supersedes its running checks.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   quality:
@@ -37,13 +45,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {os: ubuntu-latest, python: '3.10', torch: 'torch==2.10.0'}
+          - {os: ubuntu-24.04, python: '3.10', torch: 'torch==2.10.0'}
           - {os: windows-latest, python: '3.10', torch: 'torch==2.10.0'}
           - {os: macos-latest, python: '3.10', torch: 'torch==2.10.0'}
+          - {os: ubuntu-latest, python: '3.11', torch: torch}
           - {os: ubuntu-latest, python: '3.12', torch: torch}
+          - {os: ubuntu-24.04-arm, python: '3.12', torch: torch}
           - {os: windows-latest, python: '3.13', torch: torch}
+          - {os: windows-11-arm, python: '3.13', torch: torch}
           - {os: macos-latest, python: '3.13', torch: torch}
           - {os: ubuntu-latest, python: '3.14', torch: torch}
+          # onnxruntime publishes no wheels for free-threaded 3.14 or for 3.15 yet.
+          - {os: ubuntu-latest, python: '3.14t', torch: torch, without-onnx: true}
+          - {os: ubuntu-latest, python: '3.15', torch: torch, without-onnx: true}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 40
     env:
@@ -57,20 +71,23 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
           cache: pip
+      # Windows on Arm wheels are published only on PyTorch's own index.
       - name: Install CPU PyTorch on Linux and Windows
         if: runner.os != 'macOS'
         run: python -m pip install "${{ matrix.torch }}" --index-url https://download.pytorch.org/whl/cpu
       - name: Install PyTorch on macOS
         if: runner.os == 'macOS'
         run: python -m pip install "${{ matrix.torch }}"
-      - run: python -m pip install -e ".[dev,onnx]"
+      - run: python -m pip install -e ".[${{ matrix.without-onnx && 'dev' || 'dev,onnx' }}]"
+      - name: Report the platform and runtime
+        run: torch-convnd-info --json
       - run: python -m pytest -q --cov --cov-report=xml --junitxml=.artifacts/correctness.xml
       - run: python benchmarks/summarize_tests.py --junit .artifacts/correctness.xml --output .artifacts/correctness.json
       - run: python -m build
       - run: python -m twine check dist/*
         shell: bash
       - run: python tools/check_dist.py --install
-      - run: python -I tools/smoke_test.py --installed --onnx
+      - run: python -I tools/smoke_test.py --installed ${{ !matrix.without-onnx && '--onnx' || '' }}
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -95,17 +112,66 @@ jobs:
       - run: torch-convnd-info --json
 
   versions:
-    name: PyTorch ${{ matrix.torch }} compatibility
-    # PyTorch 1.11-1.12 wheels request an executable stack, which the glibc of
-    # ubuntu-latest (26.04) refuses to load; they stay on 24.04.
-    runs-on: ${{ contains(fromJSON('["1.11.0", "1.12.1"]'), matrix.torch) && 'ubuntu-24.04' || 'ubuntu-latest' }}
+    name: PyTorch ${{ matrix.torch }} / Python ${{ matrix.python }} / ${{ matrix.os || 'ubuntu-latest' }}
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        torch: ['1.11.0', '1.12.1', '1.13.1', '2.0.1', '2.1.2', '2.2.2',
-                '2.3.1', '2.4.1', '2.5.1', '2.6.0', '2.7.1', '2.8.0',
-                '2.9.0', '2.10.0', '2.11.0', '2.12.1', '2.13.0', '2.14.1']
+        include:
+          # Every release line on the oldest Python both support. PyTorch 1.11-1.12
+          # wheels request an executable stack, which the glibc of ubuntu-latest
+          # (26.04) refuses to load; they stay on 24.04.
+          - {torch: 1.11.0, python: '3.10', os: ubuntu-24.04}
+          - {torch: 1.12.1, python: '3.10', os: ubuntu-24.04}
+          - {torch: 1.13.1, python: '3.10'}
+          - {torch: 2.0.1, python: '3.10'}
+          - {torch: 2.1.2, python: '3.10'}
+          - {torch: 2.2.2, python: '3.10'}
+          - {torch: 2.3.1, python: '3.10'}
+          - {torch: 2.4.1, python: '3.10'}
+          - {torch: 2.5.1, python: '3.10'}
+          - {torch: 2.6.0, python: '3.10'}
+          - {torch: 2.7.1, python: '3.10'}
+          - {torch: 2.8.0, python: '3.10'}
+          - {torch: 2.9.0, python: '3.10'}
+          - {torch: 2.10.0, python: '3.10'}
+          - {torch: 2.11.0, python: '3.10'}
+          - {torch: 2.12.1, python: '3.10'}
+          - {torch: 2.13.0, python: '3.10'}
+          - {torch: 2.14.1, python: '3.10'}
+          - {torch: 2.15.0, python: '3.11'}
+          # Every line again on the newest Python it has wheels for. NumPy 1.x, which
+          # PyTorch up to 2.3 requires, stops at 3.12; onnxruntime has no 3.15 wheels.
+          - {torch: 1.13.1, python: '3.11'}
+          - {torch: 2.0.1, python: '3.11'}
+          - {torch: 2.1.2, python: '3.11'}
+          - {torch: 2.2.2, python: '3.12'}
+          - {torch: 2.3.1, python: '3.12'}
+          - {torch: 2.4.1, python: '3.12', extras: 'onnx,native'}
+          - {torch: 2.5.1, python: '3.13', extras: 'onnx,native'}
+          - {torch: 2.6.0, python: '3.13', extras: 'onnx,native'}
+          - {torch: 2.7.1, python: '3.13', extras: 'onnx,native'}
+          - {torch: 2.8.0, python: '3.13', extras: 'onnx,native'}
+          - {torch: 2.9.0, python: '3.14', extras: 'onnx,native'}
+          - {torch: 2.10.0, python: '3.14', extras: 'onnx,native'}
+          - {torch: 2.11.0, python: '3.14', extras: 'onnx,native'}
+          - {torch: 2.12.1, python: '3.14', extras: 'onnx,native'}
+          - {torch: 2.13.0, python: '3.15', extras: native}
+          - {torch: 2.14.1, python: '3.15', extras: native}
+          - {torch: 2.15.0, python: '3.15', extras: native}
+          # The portable floor and the first native release on every other platform;
+          # each platform's current PyTorch runs the full suite under correctness.
+          - {torch: 1.11.0, python: '3.10', os: ubuntu-24.04-arm}
+          - {torch: 2.4.1, python: '3.10', os: ubuntu-24.04-arm}
+          - {torch: 1.11.0, python: '3.10', os: windows-latest}
+          - {torch: 2.4.1, python: '3.10', os: windows-latest}
+          - {torch: 1.11.0, python: '3.10', os: macos-latest}
+          - {torch: 2.4.1, python: '3.10', os: macos-latest}
+          # Windows on Arm wheels start at 2.7 (Python 3.12); Intel macOS wheels end at 2.2.
+          - {torch: 2.7.1, python: '3.12', os: windows-11-arm, extras: 'onnx,native'}
+          - {torch: 1.11.0, python: '3.10', os: macos-15-intel}
+          - {torch: 2.2.2, python: '3.12', os: macos-15-intel}
     env:
       MAX_JOBS: '2'
       OMP_NUM_THREADS: '4'
@@ -113,15 +179,91 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python }}
           cache: pip
-      - run: python -m pip install "torch==${{ matrix.torch }}" --index-url https://download.pytorch.org/whl/cpu
-      - run: python -m pip install -e ".[legacy,onnx,native]" pytest
+      - name: Install CPU PyTorch on Linux and Windows
+        if: runner.os != 'macOS'
+        run: python -m pip install "torch==${{ matrix.torch }}" --index-url https://download.pytorch.org/whl/cpu
+      - name: Install PyTorch on macOS
+        if: runner.os == 'macOS'
+        run: python -m pip install "torch==${{ matrix.torch }}"
+      - run: python -m pip install -e ".[${{ matrix.extras || 'legacy,onnx,native' }}]" pytest
+      - name: Report the platform and runtime
+        run: torch-convnd-info --json
       - run: python -m pytest tests/test_version_compatibility.py tests/test_native_compatibility.py -q --junitxml=.artifacts/version.xml
       - name: Run generic 6D example
         run: python examples/conv6d.py
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: pytorch-${{ matrix.torch }}
+          name: pytorch-${{ matrix.torch }}-py${{ matrix.python }}-${{ matrix.os || 'ubuntu-latest' }}
           path: .artifacts/version.xml
+
+  cuda-build:
+    name: CUDA ${{ matrix.toolkit }} build / PyTorch ${{ matrix.torch }}
+    # Compiles, loads and registers the CUDA kernels without a GPU; GPU execution
+    # needs the manual CUDA workflow on a real device.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # The first native release (NVIDIA's Ubuntu 24.04 repository starts at 12.5,
+          # a compatible minor release of its CUDA 12.4) and the newest release.
+          - {torch: 2.4.1, index: cu124, toolkit: '12.5', python: '3.10'}
+          - {torch: 2.15.0, index: cu132, toolkit: '13.2', python: '3.12'}
+    env:
+      MAX_JOBS: '4'
+      PIP_NO_CACHE_DIR: '1'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install the CUDA ${{ matrix.toolkit }} compiler toolchain
+        env:
+          TOOLKIT: ${{ matrix.toolkit }}
+        run: |
+          wget -q https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+          sudo dpkg -i cuda-keyring_1.1-1_all.deb
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends "cuda-minimal-build-${TOOLKIT/./-}"
+          echo "CUDA_HOME=/usr/local/cuda-${TOOLKIT}" >> "$GITHUB_ENV"
+          echo "/usr/local/cuda-${TOOLKIT}/bin" >> "$GITHUB_PATH"
+      - run: python -m pip install "torch==${{ matrix.torch }}" --index-url "https://download.pytorch.org/whl/${{ matrix.index }}"
+      - run: python -m pip install -e ".[native]"
+      - run: nvcc --version
+      - run: python tools/check_cuda_build.py
+
+  nightly:
+    name: PyTorch nightly / Python 3.14 / ubuntu-latest
+    # A canary for the next release, on scheduled and manual CI runs only (not on
+    # release verification, which reuses this workflow).
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.workflow == 'CI')
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      MAX_JOBS: '2'
+      OMP_NUM_THREADS: '4'
+      MKL_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.14'
+          cache: pip
+      - run: python -m pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+      - name: Install the package without replacing the nightly
+        run: |
+          nightly=$(python -c "import torch; print(torch.__version__)")
+          python -m pip install -e ".[dev,onnx]" "torch==$nightly"
+          python -c "import torch; assert '.dev' in torch.__version__, torch.__version__"
+      - name: Report the platform and runtime
+        run: torch-convnd-info --json
+      - run: python -m pytest -q --junitxml=.artifacts/nightly.xml
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: pytorch-nightly
+          path: .artifacts/nightly.xml

@@ -1,8 +1,16 @@
 # Installation
 
-Use Python 3.10+ and PyTorch 1.11+. Install the CPU/CUDA/ROCm distribution suited
-to your environment before installing this package. The project's runtime
-dependency is PyTorch; export and build tools are optional extras.
+Use Python 3.10+ and PyTorch 1.11+ (PyTorch 2.15+ requires Python 3.11+). Install
+the CPU/CUDA/ROCm distribution suited to your environment before installing this
+package. The project's runtime dependency is PyTorch; export and build tools are
+optional extras.
+
+Linux, Windows and macOS are supported on x86_64 and ARM64; the
+[support matrix](support.md) lists what CI checks on each. Windows on Arm wheels
+start at PyTorch 2.7 and come from PyTorch's index
+(`--index-url https://download.pytorch.org/whl/cpu`), not PyPI. Intel macOS wheels
+end at PyTorch 2.2, which predates the native APIs, so Intel Macs use the portable
+backend.
 
 From a source checkout:
 
@@ -57,7 +65,8 @@ optimization also checks for FP32-output ATen overloads; older capable native
 builds retain FP32 promotion instead.
 
 Windows uses MSVC/Visual Studio Build Tools. The loader activates its compiler
-environment when needed. Linux uses the configured C++ compiler. macOS CPU uses
+environment for the interpreter's platform when needed; Windows on Arm needs the
+ARM64 build tools. Linux uses the configured C++ compiler. macOS CPU uses
 Apple's command-line toolchain; hosted macOS verification is defined in CI and
 has not been executed on this local Windows machine.
 

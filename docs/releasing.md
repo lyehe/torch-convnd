@@ -33,9 +33,9 @@ on a manually selected trusted GPU runner.
 
 | Workflow | Trigger / result |
 | --- | --- |
-| `ci.yml` | PR/main/manual/reusable: hooks, typing, strict docs, CPU correctness matrix, coverage, wheel/source validation and isolated installed-wheel checks |
-| `cuda.yml` | Manual only: trusted self-hosted `gpu` runner on Linux/Windows, CUDA 13 toolkit, PyTorch 2.10 cu130, native correctness and wheel checks |
-| `release.yml` | Version tag or manual: reuse CI, build checked distributions and retain artifacts; optional TestPyPI/PyPI publication |
+| `ci.yml` | PR/main/weekly/manual/reusable: hooks, typing, strict docs, CPU correctness on Linux/Windows/macOS x86_64 and ARM64, the PyTorch release-line contract, CUDA build checks, coverage, wheel/source validation and isolated installed-wheel checks; weekly and manual runs add a PyTorch nightly canary |
+| `cuda.yml` | Manual only: trusted self-hosted `gpu` runner on Linux/Windows; selectable PyTorch version, CUDA wheel index and Python (default 2.10, cu130, 3.12); native correctness and wheel checks |
+| `release.yml` | Version tag or manual: reuse CI, build checked distributions with provenance attestations, publish a GitHub release for the tag; optional TestPyPI/PyPI publication |
 | `docs.yml` | Main/manual: strict site build, optional GitHub Pages deployment |
 
 The source repository is [lyehe/torch-convnd](https://github.com/lyehe/torch-convnd).
@@ -50,13 +50,18 @@ The workflow uses OIDC rather than a stored API token. Follow
 [PyPI's setup](https://docs.pypi.org/trusted-publishers/using-a-publisher/) and
 [GitHub's OIDC guide](https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-pypi).
 
-Push a tag matching the package version. By default this runs verification and
-builds artifacts. To publish, manually dispatch the workflow on that tag with
-target `testpypi` or `pypi`. For automatic PyPI publication on version-tag pushes,
-set repository variable `PUBLISH_PYPI=true` after Trusted Publishing is configured.
-Publishing jobs require the matching version tag and successful verification.
+Push a tag matching the package version. By default this runs verification,
+builds artifacts with build-provenance attestations, and creates a GitHub release
+for the tag with the checked wheel, sdist and that version's changelog section.
+The tag needs a `## <version>` section in `CHANGELOG.md`; check it with
+`python tools/release_notes.py v0.6.0`. Verify a downloaded artifact with
+`gh attestation verify <file> --repo lyehe/torch-convnd`. To publish, manually
+dispatch the workflow on that tag with target `testpypi` or `pypi`. For automatic
+PyPI publication on version-tag pushes, set repository variable `PUBLISH_PYPI=true`
+after Trusted Publishing is configured. Publishing jobs require the matching
+version tag and successful verification.
 
-Publishing source to GitHub does not publish a package to PyPI.
+A GitHub release does not publish a package to PyPI.
 
 ## Configure documentation deployment
 

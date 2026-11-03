@@ -3,6 +3,7 @@
 import argparse
 import json
 import platform
+import sys
 from typing import Any
 
 import torch
@@ -22,6 +23,8 @@ def get_runtime_info() -> dict[str, Any]:
     return {
         "torch_convnd": __version__,
         "python": platform.python_version(),
+        # False only on a free-threaded interpreter whose imports kept the GIL disabled.
+        "gil_enabled": getattr(sys, "_is_gil_enabled", lambda: True)(),
         "platform": platform.system(),
         "machine": platform.machine(),
         "torch": str(torch.__version__),
