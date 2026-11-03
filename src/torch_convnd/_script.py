@@ -10,6 +10,9 @@ from torch.nn import functional as F
 class ScriptableConvNd(nn.Module):
     """Keep TorchScript's restricted syntax separate from eager transform dispatch."""
 
+    # TorchScript in PyTorch 2.9 reads __annotations__ from the module instance, which
+    # Python 3.14 provides only for an explicit class attribute. Attributes are inferred.
+    __annotations__ = {}
     __constants__ = [
         "dimensions",
         "stride",

@@ -1,6 +1,5 @@
 """Core adoption contract exercised independently on old and current PyTorch."""
 
-import inspect
 import io
 import itertools
 
@@ -62,19 +61,38 @@ def reference(input, weight, bias, stride=None, padding=None, dilation=None, gro
     return result if bias is None else result + bias.reshape(1, -1, *((1,) * rank))
 
 
-def stock_conv3d_error(batch, stride, padding, dilation):
-    """Largest gradient error of stock grouped conv3d against the reference."""
+def stock_conv3d_error(batch, stride, padding, dilation, groups=2, dtype=torch.float64):
+    """Largest relative gradient error of stock conv3d against the reference."""
     generator = torch.Generator().manual_seed(506)
     input = torch.randn((batch, 2, 3, 3, 3), dtype=torch.float64, generator=generator)
-    weight = torch.randn((4, 1, 2, 2, 2), dtype=torch.float64, generator=generator)
-    leaves = [input.requires_grad_(), weight.requires_grad_()]
-    geometry = {"stride": stride, "padding": padding, "dilation": dilation, "groups": 2}
+    weight = torch.randn((4, 2 // groups, 2, 2, 2), dtype=torch.float64, generator=generator)
+    leaves = [value.to(dtype).requires_grad_() for value in (input, weight)]
+    references = [value.clone().requires_grad_() for value in (input, weight)]
+    geometry = {"stride": stride, "padding": padding, "dilation": dilation, "groups": groups}
     actual = torch.nn.functional.conv3d(*leaves, None, **geometry)
     cotangent = torch.randn(actual.shape, dtype=torch.float64, generator=generator)
-    first = torch.autograd.grad(actual, leaves, cotangent)
-    second = torch.autograd.grad(reference(*leaves, None, **geometry), leaves, cotangent)
-    errors = [(value - target).abs().max() for value, target in zip(first, second, strict=True)]
-    return max(errors).item()
+    first = torch.autograd.grad(actual, leaves, cotangent.to(dtype))
+    second = torch.autograd.grad(reference(*references, None, **geometry), references, cotangent)
+    errors = [
+        ((value.double() - target).abs().max() / target.abs().max()).item()
+        for value, target in zip(first, second, strict=True)
+    ]
+    return max(errors)
+
+
+def stock_conv3d_defect(batch, stride, padding, dilation):
+    """Describe a wrong stock conv3d gradient for this geometry, or None if it is right."""
+    if stock_conv3d_error(batch, stride, padding, dilation) < 1e-9:
+        return None
+    # Which ingredients matter: precision, grouping and dilation.
+    variants = {
+        "float32": stock_conv3d_error(batch, stride, padding, dilation, dtype=torch.float32),
+        "ungrouped": stock_conv3d_error(batch, stride, padding, dilation, groups=1),
+        "undilated": stock_conv3d_error(batch, stride, padding, (1, 1, 1)),
+    }
+    details = ", ".join(f"{name} {error:.2g}" for name, error in variants.items())
+    error = stock_conv3d_error(batch, stride, padding, dilation)
+    return f"relative error {error:.2g} (float64 grouped dilated; {details})"
 
 
 @pytest.mark.parametrize("rank", [1, 2, 3, 4, 5])
@@ -104,9 +122,9 @@ def test_version_geometry_gradients(rank, backend):
         # for the same geometry, the defect is the platform's, not this package's.
         if rank in (3, 4):
             tail = {key: geometry[key][-3:] for key in ("stride", "padding", "dilation")}
-            error = stock_conv3d_error(rank - 2, **tail)
-            if error > 1e-9:
-                pytest.xfail(f"stock conv3d gradients are wrong on this platform: {error:.3g}")
+            defect = stock_conv3d_defect(rank - 2, **tail)
+            if defect is not None:
+                pytest.xfail(f"stock conv3d gradients are wrong on this platform: {defect}")
         raise
 
 
@@ -245,22 +263,9 @@ def test_version_padding(mode):
     torch.testing.assert_close(layer(input), reference(padded, layer.weight, layer.bias))
 
 
-def scripts_stock_modules():
-    """TorchScript reads ``module.__annotations__``, which Python 3.14 no longer provides
-    on instances; PyTorch 2.9 cannot script even stock layers such as Linear there."""
-    try:
-        torch.jit.script(torch.nn.Linear(1, 1))
-    except AttributeError as error:
-        if "__annotations__" not in str(error):
-            raise
-        return False
-    return True
-
-
 @pytest.mark.parametrize("mode", ["script", "trace"])
 def test_version_serialization(mode):
-    if mode == "script" and not scripts_stock_modules():
-        pytest.skip("this PyTorch's TorchScript cannot script stock modules on this Python")
+    # PyTorch 2.9 on Python 3.14 cannot script stock Linear; this layer must still script.
     layer = Conv4d(2, 3, 2, backend="torch", dtype=torch.float64)
     input = torch.randn(1, 2, 3, 3, 3, 3, dtype=torch.float64, requires_grad=True)
     compiled = torch.jit.script(layer) if mode == "script" else torch.jit.trace(layer, input)
@@ -297,6 +302,54 @@ def test_version_forward_ad():
         torch.testing.assert_close(actual.tangent, expected.tangent)
 
 
+def dynamo_unavailable():
+    """Why torch.compile cannot run here, or None."""
+    if not hasattr(torch, "compile"):
+        return "torch.compile is absent in this PyTorch"
+    try:
+        from torch._dynamo.eval_frame import check_if_dynamo_supported
+
+        check_if_dynamo_supported()
+    except Exception as error:  # an unsupported Python or platform
+        return str(error)
+    return None
+
+
+@pytest.mark.parametrize("dynamic", [False, True], ids=["static", "dynamic"])
+def test_version_compile_single_graph(dynamic, monkeypatch):
+    """Every layer kind compiles as one graph, also with symbolic sizes.
+
+    The eager backend checks graph capture alone, without a compiler or Triton. The
+    automatic rank-5 layer consults the real toolchain probe, which must fold.
+    """
+    reason = dynamo_unavailable()
+    if reason is not None:
+        pytest.skip(reason)
+    import torch._dynamo
+
+    from torch_convnd import _dispatch, _toolchain
+
+    monkeypatch.setattr(
+        _dispatch, "native_unavailable_reason", _toolchain.native_unavailable_reason
+    )
+    mask = (torch.rand(1, 1, 6, 6, 6) > 0.3).float()
+    cases = [
+        (Conv4d(2, 3, 2, padding=1, backend="torch"), (torch.randn(1, 2, 4, 4, 4, 4),)),
+        (ConvNd(2, 3, 2, dimensions=5), (torch.randn(1, 2, 3, 3, 3, 3, 3),)),
+        (
+            ConvNd(2, 3, 3, padding=1, dimensions=2, padding_mode="partial"),
+            (torch.randn(1, 2, 6, 6),),
+        ),
+        (PartialConvNd(2, 3, 3, padding=1, dimensions=3), (torch.randn(1, 2, 6, 6, 6),)),
+        (PartialConvNd(2, 3, 3, padding=1, dimensions=3), (torch.randn(1, 2, 6, 6, 6), mask)),
+    ]
+    for layer, arguments in cases:
+        torch._dynamo.reset()
+        compiled = torch.compile(layer, backend="eager", fullgraph=True, dynamic=dynamic)
+        torch.testing.assert_close(compiled(*arguments), layer(*arguments))
+    assert callable(_dispatch.native_unavailable_reason)
+
+
 @pytest.mark.skipif(not hasattr(torch, "func"), reason="torch.func is absent in this PyTorch")
 def test_version_func_jvp():
     layer = Conv4d(1, 2, 2, dtype=torch.float64, backend="torch")
@@ -321,43 +374,37 @@ def test_version_native_guard_and_diagnostics():
             load_native(with_cuda=False)
 
 
-def dynamo_conv_runs(runtime, directory):
-    """PyTorch 2.6's Dynamo exporter gives bias-free 3-D Conv nodes a [C, 2] zero bias.
-
-    ONNX requires a 1-D bias, and newer ONNX Runtime releases reject the graph, even
-    for a stock Conv3d; rank-4 layers decompose into such convolutions. The legacy
-    exporter is unaffected and is the documented choice there.
-    """
-    if "custom_translation_table" not in inspect.signature(torch.onnx.export).parameters:
-        return True
-    path = directory / "stock.onnx"
-    input = torch.ones(1, 1, 1, 1, 1)
-    stock = torch.nn.Conv3d(1, 1, 1, bias=False)
-    torch.onnx.export(stock, (input,), path, dynamo=True, external_data=False, verbose=False)
-    session = runtime.InferenceSession(str(path), providers=["CPUExecutionProvider"])
-    try:
-        session.run(None, {session.get_inputs()[0].name: input.numpy()})
-    except Exception as error:  # ONNX Runtime raises its own failure types
-        if "bias" not in str(error):
-            raise
-        return False
-    return True
-
-
 def test_version_onnx_runtime(tmp_path):
     pytest.importorskip("onnx")
     runtime = pytest.importorskip("onnxruntime")
     layer = Conv4d(2, 3, 2, backend="torch").eval()
     input = torch.randn(1, 2, 3, 3, 3, 3)
     path = tmp_path / "version.onnx"
-    dynamo = None if dynamo_conv_runs(runtime, tmp_path) else False
-    export_onnx(layer, (input,), path, external_data=False, dynamo=dynamo)
+    export_onnx(layer, (input,), path, external_data=False)
     options = runtime.SessionOptions()
     options.intra_op_num_threads = 2
     options.inter_op_num_threads = 1
     session = runtime.InferenceSession(str(path), options, providers=["CPUExecutionProvider"])
     actual = torch.from_numpy(session.run(None, {session.get_inputs()[0].name: input.numpy()})[0])
     torch.testing.assert_close(actual, layer(input), atol=2e-5, rtol=2e-5)
+
+
+@pytest.mark.parametrize("batched", [True, False], ids=["batched", "unbatched"])
+def test_version_onnx_bias_free_conv3d(batched, tmp_path):
+    """Stock bias-free Conv3d exports runnable Conv nodes through export_onnx.
+
+    onnxscript's conv3d translation, which PyTorch 2.6's Dynamo exporter uses, writes a
+    [C, 2] zero bias that ONNX Runtime 1.31 rejects; export_onnx replaces it.
+    """
+    pytest.importorskip("onnx")
+    runtime = pytest.importorskip("onnxruntime")
+    layer = torch.nn.Conv3d(2, 3, 2, padding=1, bias=False).eval()
+    input = torch.randn((1, 2, 4, 4, 4) if batched else (2, 4, 4, 4))
+    path = tmp_path / "conv3d.onnx"
+    export_onnx(layer, (input,), path, external_data=False)
+    session = runtime.InferenceSession(str(path), providers=["CPUExecutionProvider"])
+    actual = session.run(None, {session.get_inputs()[0].name: input.numpy()})[0]
+    torch.testing.assert_close(torch.from_numpy(actual), layer(input), atol=2e-5, rtol=2e-5)
 
 
 @pytest.mark.parametrize("masked", [False, True], ids=["mask_free", "masked"])

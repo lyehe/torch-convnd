@@ -48,9 +48,34 @@ def _translation_table():
     ) -> floating:
         return native_conv(input, weight, bias, stride, padding, dilation, groups, workspace_bytes)
 
+    def conv3d(
+        input: floating,
+        weight: floating,
+        bias: floating | None = None,
+        stride: Sequence[int] = (1, 1, 1),
+        padding: Sequence[int] = (0, 0, 0),
+        dilation: Sequence[int] = (1, 1, 1),
+        groups: int = 1,
+    ) -> floating:
+        # onnxscript's own conv3d gives bias-free calls the [C, 2] zero bias of its
+        # complex variant, which ONNX Runtime rejects. PyTorch 2.6 exports reach it
+        # for rank-4 layers and stock Conv3d alike; ONNX Conv needs no bias at all.
+        stride, padding, dilation = (
+            list(value) * (3 if len(value) == 1 else 1)
+            if isinstance(value, Sequence)
+            else [value] * 3
+            for value in (stride, padding, dilation)
+        )
+        unbatched = len(input.shape) != len(weight.shape)
+        if unbatched:
+            input = op.Unsqueeze(input, op.Constant(value_ints=[0]))
+        output = native_conv(input, weight, bias, stride, padding, dilation, groups, 0)
+        return op.Squeeze(output, op.Constant(value_ints=[0])) if unbatched else output
+
     return {
         torch.ops.torch_convnd.conv_nd.default: native_conv,
         torch.ops.torch_convnd.compatible_conv_nd.default: compatible_conv,
+        torch.ops.aten.conv3d.default: conv3d,
     }
 
 
@@ -95,6 +120,8 @@ def export_onnx(model, args, path=None, *, opset_version=None, dynamo=None, **kw
     ``dynamic_shapes`` and ``input_names``, to :func:`torch.onnx.export`. Complex
     tensor interfaces are outside the ONNX Conv schema, as for stock Conv2d/3d.
     Execution support for a rank/dtype depends on the chosen ONNX runtime provider.
+    The Dynamo exporter also uses this package's ``aten.conv3d`` translation, so
+    bias-free 3-D convolutions, stock layers included, get valid Conv nodes.
     """
     try:
         import onnx  # noqa: F401

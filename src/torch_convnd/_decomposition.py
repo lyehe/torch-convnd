@@ -5,6 +5,8 @@ import math
 import torch
 from torch.nn import functional as F
 
+from ._geometry import any_true
+
 
 def conv4d_taps(input, weight, bias, stride, padding, dilation, groups):
     """Compute unrestricted 4D weights with batched vendor Conv3d kernels.
@@ -56,7 +58,7 @@ def composite_conv(input, weight, bias, stride, padding, dilation, groups, works
             spatial, padding, dilation, kernel, stride, strict=True
         )
     )
-    if any(size <= 0 for size in output_shape):
+    if any_true([size <= 0 for size in output_shape]):
         raise RuntimeError("kernel exceeds padded input")
     volume, kernel_volume = math.prod(spatial), math.prod(kernel)
     output_volume = math.prod(output_shape)

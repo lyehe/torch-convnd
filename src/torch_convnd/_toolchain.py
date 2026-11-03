@@ -27,8 +27,9 @@ def msvc_environment():
     return _get_vc_env(_VCVARS_SPEC.get(sysconfig.get_platform(), "x86_amd64"))
 
 
-@assume_constant_result
 @cache
+# Dynamo inlines the function inside a cache wrapper, so the constant mark goes there.
+@assume_constant_result
 def native_unavailable_reason(device_type: str) -> str | None:
     """Return a missing prerequisite, or None when a native build can be attempted.
 

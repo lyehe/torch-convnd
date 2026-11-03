@@ -19,7 +19,7 @@ from ._compat import (
     plain_tensor,
 )
 from ._dispatch import BACKENDS, convolution, ensure_compatible_operator
-from ._geometry import DEFAULT_WORKSPACE_BYTES, _tuple
+from ._geometry import DEFAULT_WORKSPACE_BYTES, _tuple, any_true
 from ._padding import apply_padding, padding_pairs
 
 _CASTABLE = {torch.float16, torch.bfloat16, torch.float32}
@@ -128,7 +128,7 @@ def conv_nd(
         or weight.shape[1] != input.shape[1] // groups
     ):
         raise RuntimeError("input/weight channels must match and be divisible by groups")
-    if any(size <= 0 for size in (*input.shape[2:], *weight.shape[2:])):
+    if any_true([size <= 0 for size in (*input.shape[2:], *weight.shape[2:])]):
         raise RuntimeError("spatial and kernel dimensions must be positive")
     if input.device != weight.device:
         raise RuntimeError("input and weight must have the same device and dtype")
@@ -149,7 +149,7 @@ def _execute(
     input, weight, bias, stride, pairs, dilation, groups, padding_mode, workspace_bytes, backend
 ):
     """Pad and dispatch a batched convolution whose arguments conv_nd has validated."""
-    if padding_mode != "zeros" or any(left != right for left, right in pairs):
+    if padding_mode != "zeros" or any_true([left != right for left, right in pairs]):
         input = apply_padding(input, pairs, padding_mode)
         implicit_padding = (0,) * len(pairs)
     else:
@@ -242,7 +242,7 @@ def _mask_free_update_is_full(spatial, kernel, stride, padding, dilation, paddin
     """
     if padding_mode != "zeros":
         return True
-    if any(type(size) is not int for size in spatial):
+    if any_true([type(size) is not int for size in spatial]):
         return False
     rank = len(kernel)
     steps, spacings = _tuple(stride, rank, "stride"), _tuple(dilation, rank, "dilation")
@@ -346,8 +346,8 @@ def _mask_free_scale(
                 vector = _cached_axis_counts(*geometry, exact, device, stream)
             else:
                 vector = _axis_counts(*geometry, exact, device)
-            shape = [1, 1] + [1] * rank
-            shape[axis + 2] = -1
+            # Built whole: Dynamo before PyTorch 2.4 cannot trace list item assignment.
+            shape = (1, 1) + (1,) * axis + (-1,) + (1,) * (rank - axis - 1)
             counts = counts * vector.reshape(shape)
             full = full and _axis_is_full(*geometry)
         ratio, update = _scale(counts, math.prod(kernel), ratio_dtype, update_dtype)
@@ -460,7 +460,7 @@ def _partial_conv_nd(
     pairs = padding_pairs(pads, kernel, steps, spacings)
     full, valid = False, None
     if mask is None:
-        if padding_mode != "zeros" or not any(left or right for left, right in pairs):
+        if padding_mode != "zeros" or not any_true([left or right for left, right in pairs]):
             # Every tap reads a real or copied sample: an ordinary convolution.
             output = conv_nd(input, weight, bias, stride, padding, dilation, groups, **options)
             update = None
@@ -473,7 +473,7 @@ def _partial_conv_nd(
             return output, update
         window = math.prod(kernel)
         capturing = not is_compiling() and is_capturing(input.device)
-        if not all(type(size) is int for size in spatial) or capturing:
+        if any_true([type(size) is not int for size in spatial]) or capturing:
             # Symbolic sizes (dynamic export, tracing) or CUDA graph capture: count with
             # a convolution, which needs no host values.
             valid = torch.ones((1, 1, *spatial), dtype=exact, device=input.device)
