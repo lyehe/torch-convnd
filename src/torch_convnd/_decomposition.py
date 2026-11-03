@@ -35,7 +35,7 @@ def conv4d_taps(input, weight, bias, stride, padding, dilation, groups):
         result = result.reshape(input.shape[0], extent, weight.shape[0], *result.shape[2:])
         result = result.permute(0, 2, 1, 3, 4, 5)
         output_dtype = result.dtype
-        partial = result.float() if result.dtype in {torch.float16, torch.bfloat16} else result
+        partial = result.float() if result.dtype in (torch.float16, torch.bfloat16) else result
         accumulator = partial if accumulator is None else accumulator + partial
     if bias is not None:
         accumulator = accumulator + bias.reshape(1, -1, 1, 1, 1, 1).to(accumulator.dtype)
@@ -63,7 +63,9 @@ def composite_conv(input, weight, bias, stride, padding, dilation, groups, works
     volume, kernel_volume = math.prod(spatial), math.prod(kernel)
     output_volume = math.prod(output_shape)
     rows = channels * kernel_volume
-    bytes_per_position = max(4, input.element_size()) * rows
+    # dtype.itemsize (PyTorch 2.1+) traces in Dynamo, unlike Tensor.element_size before 2.3.
+    itemsize = getattr(input.dtype, "itemsize", None) or input.element_size()
+    bytes_per_position = max(4, itemsize) * rows
     if workspace_bytes < bytes_per_position:
         raise RuntimeError("workspace_bytes is too small for one output position")
     tile = min(output_volume, workspace_bytes // bytes_per_position)

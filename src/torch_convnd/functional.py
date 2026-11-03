@@ -1,5 +1,6 @@
 """Public full N-dimensional convolution, validation and layout handling."""
 
+import contextlib
 import functools
 import math
 from collections.abc import Sequence
@@ -19,16 +20,26 @@ from ._compat import (
     plain_tensor,
 )
 from ._dispatch import BACKENDS, convolution, ensure_compatible_operator
-from ._geometry import DEFAULT_WORKSPACE_BYTES, _tuple, any_true
+from ._geometry import DEFAULT_WORKSPACE_BYTES, _tuple, any_true, has_rank
 from ._padding import apply_padding, padding_pairs
 
-_CASTABLE = {torch.float16, torch.bfloat16, torch.float32}
+# Tuples, not sets: Dynamo before PyTorch 2.2 cannot trace set membership.
+_CASTABLE = (torch.float16, torch.bfloat16, torch.float32)
 _REAL = {torch.complex64: torch.float32, torch.complex128: torch.float64}
 if hasattr(torch, "complex32"):  # absent in PyTorch 1.11
     _REAL[torch.complex32] = torch.float16
 
 
-_PADDING_MODES = {"zeros", "reflect", "replicate", "circular", "partial"}
+_PADDING_MODES = ("zeros", "reflect", "replicate", "circular", "partial")
+
+
+def _outside_inference():
+    """Leave inference mode, so eager caches serve both modes.
+
+    Compiled counts are never cached, and Dynamo before PyTorch 2.3 cannot trace
+    the context. Leaving inference mode enables grad mode, so enter it before no_grad.
+    """
+    return contextlib.nullcontext() if is_compiling() else torch.inference_mode(False)
 
 
 class PartialConvOutput(NamedTuple):
@@ -89,7 +100,7 @@ def conv_nd(
     if not 1 <= rank <= 62:
         message = "weight must have output/input channels and 1-62 spatial dimensions"
         raise ValueError(message)
-    if input.ndim not in {rank + 1, rank + 2}:
+    if not has_rank(input.ndim, rank):
         raise ValueError(f"expected {rank + 1} unbatched or {rank + 2} batched dimensions")
     unbatched = input.ndim == rank + 1
     if unbatched:
@@ -302,7 +313,7 @@ def _axis_counts(size, kernel, stride, dilation, left, right, dtype, device):
     No host values are copied, so nothing synchronizes and symbolic sizes stay symbolic.
     """
     length = _windows(size, kernel, stride, dilation, left, right)
-    with torch.inference_mode(False), torch.no_grad():
+    with _outside_inference(), torch.no_grad():
         origin = torch.arange(-left, (length - 1) * stride - left + 1, stride, device=device)
         first = (-torch.div(origin, dilation, rounding_mode="floor")).clamp_min(0)
         last = torch.div(size - 1 - origin, dilation, rounding_mode="floor")
@@ -336,7 +347,7 @@ def _mask_free_scale(
     ``cache`` keeps short per-axis vectors for the caller's ``stream``.
     """
     rank, full = len(spatial), True
-    with torch.inference_mode(False), torch.no_grad():
+    with _outside_inference(), torch.no_grad():
         counts = torch.ones((1, 1) + (1,) * rank, dtype=exact, device=device)
         for axis, (size, taps, step, spacing, (left, right)) in enumerate(
             zip(spatial, kernel, stride, dilation, pairs, strict=True)
@@ -415,7 +426,7 @@ def _partial_conv_nd(
     if not 1 <= rank <= 62:
         message = "weight must have output/input channels and 1-62 spatial dimensions"
         raise ValueError(message)
-    if input.ndim not in {rank + 1, rank + 2}:
+    if not has_rank(input.ndim, rank):
         raise ValueError(f"expected {rank + 1} unbatched or {rank + 2} batched dimensions")
     if not isinstance(multi_channel, bool):
         raise TypeError("multi_channel must be a bool")

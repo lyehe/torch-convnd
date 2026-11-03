@@ -54,7 +54,7 @@ def _portable_conv(input, weight, bias, stride, padding, dilation, groups, works
     """Cast AMP operands once, rather than once per 3D kernel slice."""
     if input.device.type in {"cpu", "cuda"} and is_autocast_enabled(input.device.type):
         dtype = autocast_dtype(input.device.type)
-        castable = {torch.float16, torch.bfloat16, torch.float32}
+        castable = (torch.float16, torch.bfloat16, torch.float32)
         input = input.to(dtype) if input.dtype in castable else input
         weight = weight.to(dtype) if weight.dtype in castable else weight
         bias = bias.to(dtype) if bias is not None and bias.dtype in castable else bias

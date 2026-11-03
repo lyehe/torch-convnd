@@ -6,15 +6,24 @@ DEFAULT_WORKSPACE_BYTES = 64 * 1024 * 1024
 
 
 def any_true(values: list) -> bool:
-    """``any`` over a list, in a form that compiles as one graph from PyTorch 2.0.
+    """``any`` over a list, in a form every Dynamo release compiles as one graph.
 
-    Dynamo before PyTorch 2.5 cannot trace ``any``/``all`` over generators, nor over
-    symbolic sizes; a loop over a list comprehension traces on every release.
+    Dynamo does not trace ``any``/``all`` over generators on every release, nor over
+    symbolic sizes before PyTorch 2.5; a loop over a list comprehension always traces.
     """
     for value in values:
         if value:
             return True
     return False
+
+
+def has_rank(ndim: int, rank: int) -> bool:
+    """Whether ``ndim`` dimensions hold a batched or unbatched rank-``rank`` input.
+
+    Plain comparisons: Dynamo can make integer module attributes symbolic, and testing
+    membership against them does not trace on every release.
+    """
+    return ndim == rank + 2 or ndim == rank + 1
 
 
 def _tuple(value: int | Sequence[int], rank: int, name: str) -> tuple[int, ...]:
