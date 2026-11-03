@@ -36,7 +36,7 @@ optional APIs are probed and portable execution avoids modern custom-op dependen
 | --- | --- |
 | Dense forward/backward, higher derivatives, padding, state dictionaries | Portable core verified on 1.11-2.15 |
 | Script/trace | Compatible operator when available; pure Tensor script adapter otherwise |
-| `torch.func` / `torch.compile` | Only where the framework supplies the API; every layer kind captures as one graph (`fullgraph=True`), static and dynamic, wherever Dynamo runs |
+| `torch.func` / `torch.compile` | Only where the framework supplies the API; every layer kind captures as one graph (`fullgraph=True`), static and dynamic, from 2.2. Dynamo 2.0-2.1 cannot trace `zip(strict=True)`, so those compile with graph breaks |
 | Native autograd/fake kernels | Requires detected registration and unified-autocast APIs; CPU checked from 2.4 |
 | Native raw-op vmap | Registration is conditional; public transforms retain tensor decompositions |
 | FP32-output mixed CUDA GEMM | Requires the actual ATen overloads; FP32-promotion fallback otherwise |

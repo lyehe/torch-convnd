@@ -315,12 +315,29 @@ def dynamo_unavailable():
     return None
 
 
+def traces_strict_zip():
+    """Whether Dynamo traces zip(strict=True), which the layers use (PyTorch 2.2+)."""
+
+    def pairs(x):
+        for left, right in zip((1, 2), (3, 4), strict=True):
+            x = x + left * right
+        return x
+
+    try:
+        torch.compile(pairs, backend="eager", fullgraph=True)(torch.ones(1))
+    except Exception:  # Dynamo's Unsupported, whose module moved across releases
+        return False
+    return True
+
+
 @pytest.mark.parametrize("dynamic", [False, True], ids=["static", "dynamic"])
 def test_version_compile_single_graph(dynamic, monkeypatch):
     """Every layer kind compiles as one graph, also with symbolic sizes.
 
-    The eager backend checks graph capture alone, without a compiler or Triton. The
-    automatic rank-5 layer consults the real toolchain probe, which must fold.
+    Where Dynamo cannot trace zip(strict=True) (PyTorch 2.0-2.1), the layers still
+    compile and agree, with graph breaks. The eager backend checks graph capture alone,
+    without a compiler or Triton; the automatic rank-5 layer consults the real
+    toolchain probe, which must fold.
     """
     reason = dynamo_unavailable()
     if reason is not None:
@@ -328,6 +345,8 @@ def test_version_compile_single_graph(dynamic, monkeypatch):
     import torch._dynamo
 
     from torch_convnd import _dispatch, _toolchain
+
+    fullgraph = traces_strict_zip()
 
     monkeypatch.setattr(
         _dispatch, "native_unavailable_reason", _toolchain.native_unavailable_reason
@@ -345,7 +364,7 @@ def test_version_compile_single_graph(dynamic, monkeypatch):
     ]
     for layer, arguments in cases:
         torch._dynamo.reset()
-        compiled = torch.compile(layer, backend="eager", fullgraph=True, dynamic=dynamic)
+        compiled = torch.compile(layer, backend="eager", fullgraph=fullgraph, dynamic=dynamic)
         torch.testing.assert_close(compiled(*arguments), layer(*arguments))
     assert callable(_dispatch.native_unavailable_reason)
 

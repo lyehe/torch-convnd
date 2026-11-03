@@ -62,6 +62,15 @@ install a CUDA build of PyTorch and a matching toolkit, then run
 `python tools/check_cuda_build.py`. It also compares the CPU kernels of that build
 with the portable path. CI runs it for the first native release and the newest.
 
+To check the native kernels for memory errors and undefined behavior on Linux,
+preload the GCC sanitizer runtimes and run tests through `tools/sanitize_native.py`,
+which builds a separately cached, sanitized addon:
+
+```sh
+LD_PRELOAD="$(gcc -print-file-name=libasan.so) $(gcc -print-file-name=libubsan.so)" \
+ASAN_OPTIONS=detect_leaks=0 python tools/sanitize_native.py -q tests/test_native_compatibility.py
+```
+
 ## Archive a run
 
 ```sh

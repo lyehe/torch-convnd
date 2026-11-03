@@ -33,15 +33,17 @@
 - Report the CPU model, ATen's CPU capability and whether the GIL is enabled in
   `torch-convnd-info`.
 - Compile every layer kind as one graph (`torch.compile(fullgraph=True)`), with static
-  or dynamic sizes, on every PyTorch whose Dynamo runs. Automatic layers that may
-  use native kernels failed on every release, because Dynamo traced into the
-  toolchain probe: its constant mark sat on the cache wrapper, which Dynamo
-  unwraps. Older Dynamo releases also broke the graph on `any`/`all` over
-  generators, the functorch probe (before 2.5), list item assignment (2.3),
-  `Tensor.is_complex()` (2.3), comparing a module with `None`,
-  `Tensor.element_size()` and `inference_mode` (2.2), and sets (2.0-2.1). Compiled
+  or dynamic sizes, from PyTorch 2.2. Automatic layers that may use native kernels
+  failed on every release, because Dynamo traced into the toolchain probe: its
+  constant mark sat on the cache wrapper, which Dynamo unwraps. Older Dynamo
+  releases also broke the graph on `any`/`all` over generators, the functorch probe
+  (before 2.5), list item assignment (2.3), `Tensor.is_complex()` (2.3), comparing a
+  module with `None`, `Tensor.element_size()` and `inference_mode` (2.2). Compiled
   graphs before 2.5 keep the portable path, which every transform supports, since
-  the native operator has no vmap rule there.
+  the native operator has no vmap rule there. Dynamo 2.0-2.1 cannot trace
+  `zip(strict=True)`, so those releases compile with graph breaks.
+- Check the native kernels under AddressSanitizer and UBSan in CI
+  (`tools/sanitize_native.py`).
 - Export bias-free 3-D convolutions that ONNX Runtime accepts. onnxscript's `conv3d`
   translation, used by PyTorch 2.6's Dynamo exporter, writes a `[C_out, 2]` zero bias
   copied from its complex variant; `export_onnx` now supplies a correct one, which
