@@ -32,17 +32,22 @@
   interpreter's platform, using the ARM64 toolset there, instead of always x64.
 - Report the CPU model, ATen's CPU capability and whether the GIL is enabled in
   `torch-convnd-info`.
-- Document, and detect in the version contract, two upstream defects: PyTorch 2.6's
-  Dynamo exporter writes an invalid zero bias for bias-free 3-D convolutions (export
-  with `dynamo=False` there), and PyTorch 2.9's TorchScript cannot script modules on
-  Python 3.14.
+- Document, and detect in the version contract, three upstream defects: PyTorch
+  2.6's Dynamo exporter writes an invalid zero bias for bias-free 3-D convolutions
+  (export with `dynamo=False` there), PyTorch 2.9's TorchScript cannot script
+  modules on Python 3.14, and PyTorch 2.4.1 on Windows computes wrong grouped,
+  dilated float64 `conv3d` gradients on AMD CPUs.
+- Check Apple MPS values, gradients and masked partial convolution against float64
+  CPU references wherever MPS is available, including hosted macOS runners.
 - Broaden CI to PyTorch 2.15 and Python 3.15. The version contract runs every
   release line from 1.11 on the oldest and the newest Python it supports, and the
   portable and native floors on Linux ARM64, Windows, macOS, Windows on Arm and
   Intel macOS. The full suite adds Python 3.11, 3.15 and free-threaded 3.14t, Linux
   ARM64 and Windows on Arm. Hosted CI compiles, loads and registers the CUDA kernels
   without a GPU for PyTorch 2.4 and 2.15 (`tools/check_cuda_build.py`), runs weekly,
-  and adds a PyTorch nightly canary to scheduled and manual runs.
+  and adds a PyTorch nightly canary to scheduled and manual runs. Uploaded
+  correctness artifacts now include the JUnit and JSON reports, which sat in a
+  dot-directory that uploads skipped.
 - Releases attest build provenance and publish a GitHub release with the checked
   wheel, sdist and changelog section (`tools/release_notes.py`). The manual CUDA
   workflow takes the PyTorch version, CUDA wheel index and Python as inputs.

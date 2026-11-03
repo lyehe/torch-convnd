@@ -65,6 +65,8 @@ jobs:
         if: always()
         with:
           name: cuda-correctness
+          # The reports live in a dot-directory, which uploads skip by default.
+          include-hidden-files: true
           path: |
             .artifacts/*.xml
             .artifacts/*.json

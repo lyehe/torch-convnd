@@ -22,6 +22,12 @@ Windows on Arm wheels are published on PyTorch's own index
 loads and registers the native kernels without a GPU for PyTorch 2.4 (CUDA 12.5
 toolkit) and 2.15 (CUDA 13.2); CUDA execution needs the manual GPU workflow.
 
+Hosted macOS runners expose a paravirtualized Apple GPU. There, CI checks Apple
+MPS values and gradients for ranks 1-5 and masked partial convolution against
+float64 CPU references, with PyTorch 2.10 in the full suite and wherever a version
+contract job's PyTorch accepts the device. PyTorch 2.15 refuses it (it lacks
+Metal 2.0 support), so the current-PyTorch macOS job runs without MPS.
+
 There is no promise that an absent framework API is emulated, or that an untested
 future release is already verified. The package has no hard upper version pin;
 optional APIs are probed and portable execution avoids modern custom-op dependencies.
@@ -61,9 +67,11 @@ show speed and memory tradeoffs, including native workspace costs.
 The [correctness report](PARITY.md) retains historical baselines and the current
 compatibility evidence. Local hardware is Windows CPU and RTX 4090.
 Python 3.13 / PyTorch 2.14.1 CPU is additionally exercised in a separate environment.
-Linux/macOS, Apple MPS, AMD ROCm and other GPUs have not been executed locally;
-hosted CI covers Linux and macOS on CPU only. Its CUDA build check proves that the
-kernels compile and register, not that they run. The CUDA workflow is manual and
+Linux/macOS, Apple MPS, AMD ROCm and other GPUs have not been executed locally.
+Hosted CI covers Linux, Windows and macOS CPUs (Intel and AMD x86_64, Arm), and
+Apple MPS on the macOS runners' paravirtualized GPU; `torch-convnd-info` records
+each runner's CPU model. Its CUDA build check proves that the kernels compile and
+register, not that they run. The CUDA workflow is manual and
 requires a trusted self-hosted runner with a matching toolkit; its PyTorch version,
 CUDA wheel index and Python are selectable. CI does not claim distributed
 multi-process or CUDA Graph coverage.
@@ -76,16 +84,21 @@ unavailable. Other versions/providers may differ. Complex tensor interfaces are
 outside the [ONNX Conv schema](https://onnx.ai/onnx/operators/onnx__Conv.html);
 provide an explicit real/imaginary model interface when required.
 
-Two upstream defects are tied to specific releases, and the version contract
-detects both rather than hiding them:
+Three upstream defects are tied to specific releases. The version contract
+detects each one rather than hiding it:
 
 - PyTorch 2.6's Dynamo exporter gives every bias-free 3-D convolution, stock
   `Conv3d` included, a `[C_out, 2]` zero bias. ONNX requires a 1-D bias, and ONNX
-  Runtime 1.31 rejects the graph (1.23 ignored it). Rank-4 and higher layers
+  Runtime 1.31 rejects the graph (1.23 ignored it). Rank-4 layers on CPU and CUDA
   decompose into such convolutions, so on 2.6 export with `dynamo=False`.
 - On Python 3.14, TorchScript in PyTorch 2.9 cannot script modules at all, stock
   `Linear` included: it reads `__annotations__` from instances, which Python 3.14
   no longer provides. Use PyTorch 2.10 or later to script on Python 3.14.
+- PyTorch 2.4.1 on Windows computes wrong stock `conv3d` gradients for grouped,
+  dilated float64 problems on AMD CPUs (Zen 3 and Zen 5 runners), while Intel CPUs
+  and Linux on the same AMD CPUs are correct. Ranks 3 and 4 inherit it there. The
+  contract records an expected failure only after checking stock `conv3d` itself
+  on the same geometry. Use a later PyTorch on such hosts.
 
 Default rank-2/3 vendor paths inherit PyTorch's empty-vmap behavior and layout
 selection. The raw native rule preserves the logical inner batch for empty maps;
