@@ -32,11 +32,27 @@
   interpreter's platform, using the ARM64 toolset there, instead of always x64.
 - Report the CPU model, ATen's CPU capability and whether the GIL is enabled in
   `torch-convnd-info`.
-- Document, and detect in the version contract, three upstream defects: PyTorch
-  2.6's Dynamo exporter writes an invalid zero bias for bias-free 3-D convolutions
-  (export with `dynamo=False` there), PyTorch 2.9's TorchScript cannot script
-  modules on Python 3.14, and PyTorch 2.4.1 on Windows computes wrong grouped,
-  dilated float64 `conv3d` gradients on AMD CPUs.
+- Compile every layer kind as one graph (`torch.compile(fullgraph=True)`), with static
+  or dynamic sizes, from PyTorch 2.2. Automatic layers that may use native kernels
+  failed on every release, because Dynamo traced into the toolchain probe: its
+  constant mark sat on the cache wrapper, which Dynamo unwraps. Older Dynamo
+  releases also broke the graph on `any`/`all` over generators, the functorch probe
+  (before 2.5), list item assignment (2.3), `Tensor.is_complex()` (2.3), comparing a
+  module with `None`, `Tensor.element_size()` and `inference_mode` (2.2). Compiled
+  graphs before 2.5 keep the portable path, which every transform supports, since
+  the native operator has no vmap rule there. Dynamo 2.0-2.1 cannot trace
+  `zip(strict=True)`, so those releases compile with graph breaks.
+- Check the native kernels under AddressSanitizer and UBSan in CI
+  (`tools/sanitize_native.py`).
+- Export bias-free 3-D convolutions that ONNX Runtime accepts. onnxscript's `conv3d`
+  translation, used by PyTorch 2.6's Dynamo exporter, writes a `[C_out, 2]` zero bias
+  copied from its complex variant; `export_onnx` now supplies a correct one, which
+  also repairs stock `Conv3d` layers in the exported model.
+- Script layers on Python 3.14 with PyTorch 2.9, whose TorchScript reads
+  `__annotations__` from module instances; the scriptable adapter declares it
+  explicitly. Stock modules such as `Linear` still need PyTorch 2.10 there.
+- Document and detect in the version contract that PyTorch 2.4.1 on Windows
+  computes wrong grouped, dilated float64 `conv3d` gradients on AMD CPUs.
 - Check Apple MPS values, gradients and masked partial convolution against float64
   CPU references wherever MPS is available, including hosted macOS runners.
 - Broaden CI to PyTorch 2.15 and Python 3.15. The version contract runs every

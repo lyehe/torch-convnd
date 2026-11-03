@@ -239,6 +239,30 @@ jobs:
       - run: nvcc --version
       - run: python tools/check_cuda_build.py
 
+  sanitizers:
+    name: Native kernels under AddressSanitizer and UBSan
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      MAX_JOBS: '4'
+      OMP_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install -e ".[dev]"
+      - name: Run the native tests with sanitized kernels
+        run: |
+          LD_PRELOAD="$(gcc -print-file-name=libasan.so) $(gcc -print-file-name=libubsan.so)"
+          export LD_PRELOAD
+          export ASAN_OPTIONS=detect_leaks=0:detect_odr_violation=0:abort_on_error=1
+          export UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1
+          python tools/sanitize_native.py -q tests/test_native_compatibility.py \
+            tests/test_correctness_properties.py tests/test_partial_native.py tests/test_convnd.py
+
   nightly:
     name: PyTorch nightly / Python 3.14 / ubuntu-latest
     # A canary for the next release, on scheduled and manual CI runs only (not on

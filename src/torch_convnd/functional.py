@@ -1,5 +1,6 @@
 """Public full N-dimensional convolution, validation and layout handling."""
 
+import contextlib
 import functools
 import math
 from collections.abc import Sequence
@@ -19,16 +20,26 @@ from ._compat import (
     plain_tensor,
 )
 from ._dispatch import BACKENDS, convolution, ensure_compatible_operator
-from ._geometry import DEFAULT_WORKSPACE_BYTES, _tuple
+from ._geometry import DEFAULT_WORKSPACE_BYTES, _tuple, any_true, has_rank
 from ._padding import apply_padding, padding_pairs
 
-_CASTABLE = {torch.float16, torch.bfloat16, torch.float32}
+# Tuples, not sets: Dynamo before PyTorch 2.2 cannot trace set membership.
+_CASTABLE = (torch.float16, torch.bfloat16, torch.float32)
 _REAL = {torch.complex64: torch.float32, torch.complex128: torch.float64}
 if hasattr(torch, "complex32"):  # absent in PyTorch 1.11
     _REAL[torch.complex32] = torch.float16
 
 
-_PADDING_MODES = {"zeros", "reflect", "replicate", "circular", "partial"}
+_PADDING_MODES = ("zeros", "reflect", "replicate", "circular", "partial")
+
+
+def _outside_inference():
+    """Leave inference mode, so eager caches serve both modes.
+
+    Compiled counts are never cached, and Dynamo before PyTorch 2.3 cannot trace
+    the context. Leaving inference mode enables grad mode, so enter it before no_grad.
+    """
+    return contextlib.nullcontext() if is_compiling() else torch.inference_mode(False)
 
 
 class PartialConvOutput(NamedTuple):
@@ -89,7 +100,7 @@ def conv_nd(
     if not 1 <= rank <= 62:
         message = "weight must have output/input channels and 1-62 spatial dimensions"
         raise ValueError(message)
-    if input.ndim not in {rank + 1, rank + 2}:
+    if not has_rank(input.ndim, rank):
         raise ValueError(f"expected {rank + 1} unbatched or {rank + 2} batched dimensions")
     unbatched = input.ndim == rank + 1
     if unbatched:
@@ -128,7 +139,7 @@ def conv_nd(
         or weight.shape[1] != input.shape[1] // groups
     ):
         raise RuntimeError("input/weight channels must match and be divisible by groups")
-    if any(size <= 0 for size in (*input.shape[2:], *weight.shape[2:])):
+    if any_true([size <= 0 for size in (*input.shape[2:], *weight.shape[2:])]):
         raise RuntimeError("spatial and kernel dimensions must be positive")
     if input.device != weight.device:
         raise RuntimeError("input and weight must have the same device and dtype")
@@ -149,7 +160,7 @@ def _execute(
     input, weight, bias, stride, pairs, dilation, groups, padding_mode, workspace_bytes, backend
 ):
     """Pad and dispatch a batched convolution whose arguments conv_nd has validated."""
-    if padding_mode != "zeros" or any(left != right for left, right in pairs):
+    if padding_mode != "zeros" or any_true([left != right for left, right in pairs]):
         input = apply_padding(input, pairs, padding_mode)
         implicit_padding = (0,) * len(pairs)
     else:
@@ -242,7 +253,7 @@ def _mask_free_update_is_full(spatial, kernel, stride, padding, dilation, paddin
     """
     if padding_mode != "zeros":
         return True
-    if any(type(size) is not int for size in spatial):
+    if any_true([type(size) is not int for size in spatial]):
         return False
     rank = len(kernel)
     steps, spacings = _tuple(stride, rank, "stride"), _tuple(dilation, rank, "dilation")
@@ -302,7 +313,7 @@ def _axis_counts(size, kernel, stride, dilation, left, right, dtype, device):
     No host values are copied, so nothing synchronizes and symbolic sizes stay symbolic.
     """
     length = _windows(size, kernel, stride, dilation, left, right)
-    with torch.inference_mode(False), torch.no_grad():
+    with _outside_inference(), torch.no_grad():
         origin = torch.arange(-left, (length - 1) * stride - left + 1, stride, device=device)
         first = (-torch.div(origin, dilation, rounding_mode="floor")).clamp_min(0)
         last = torch.div(size - 1 - origin, dilation, rounding_mode="floor")
@@ -336,7 +347,7 @@ def _mask_free_scale(
     ``cache`` keeps short per-axis vectors for the caller's ``stream``.
     """
     rank, full = len(spatial), True
-    with torch.inference_mode(False), torch.no_grad():
+    with _outside_inference(), torch.no_grad():
         counts = torch.ones((1, 1) + (1,) * rank, dtype=exact, device=device)
         for axis, (size, taps, step, spacing, (left, right)) in enumerate(
             zip(spatial, kernel, stride, dilation, pairs, strict=True)
@@ -346,8 +357,8 @@ def _mask_free_scale(
                 vector = _cached_axis_counts(*geometry, exact, device, stream)
             else:
                 vector = _axis_counts(*geometry, exact, device)
-            shape = [1, 1] + [1] * rank
-            shape[axis + 2] = -1
+            # Built whole: Dynamo before PyTorch 2.4 cannot trace list item assignment.
+            shape = (1, 1) + (1,) * axis + (-1,) + (1,) * (rank - axis - 1)
             counts = counts * vector.reshape(shape)
             full = full and _axis_is_full(*geometry)
         ratio, update = _scale(counts, math.prod(kernel), ratio_dtype, update_dtype)
@@ -415,7 +426,7 @@ def _partial_conv_nd(
     if not 1 <= rank <= 62:
         message = "weight must have output/input channels and 1-62 spatial dimensions"
         raise ValueError(message)
-    if input.ndim not in {rank + 1, rank + 2}:
+    if not has_rank(input.ndim, rank):
         raise ValueError(f"expected {rank + 1} unbatched or {rank + 2} batched dimensions")
     if not isinstance(multi_channel, bool):
         raise TypeError("multi_channel must be a bool")
@@ -460,7 +471,7 @@ def _partial_conv_nd(
     pairs = padding_pairs(pads, kernel, steps, spacings)
     full, valid = False, None
     if mask is None:
-        if padding_mode != "zeros" or not any(left or right for left, right in pairs):
+        if padding_mode != "zeros" or not any_true([left or right for left, right in pairs]):
             # Every tap reads a real or copied sample: an ordinary convolution.
             output = conv_nd(input, weight, bias, stride, padding, dilation, groups, **options)
             update = None
@@ -473,7 +484,7 @@ def _partial_conv_nd(
             return output, update
         window = math.prod(kernel)
         capturing = not is_compiling() and is_capturing(input.device)
-        if not all(type(size) is int for size in spatial) or capturing:
+        if any_true([type(size) is not int for size in spatial]) or capturing:
             # Symbolic sizes (dynamic export, tracing) or CUDA graph capture: count with
             # a convolution, which needs no host values.
             valid = torch.ones((1, 1, *spatial), dtype=exact, device=input.device)

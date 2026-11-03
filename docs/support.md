@@ -36,7 +36,7 @@ optional APIs are probed and portable execution avoids modern custom-op dependen
 | --- | --- |
 | Dense forward/backward, higher derivatives, padding, state dictionaries | Portable core verified on 1.11-2.15 |
 | Script/trace | Compatible operator when available; pure Tensor script adapter otherwise |
-| `torch.func` / `torch.compile` | Only where the framework supplies the API |
+| `torch.func` / `torch.compile` | Only where the framework supplies the API; every layer kind captures as one graph (`fullgraph=True`), static and dynamic, from 2.2. Dynamo 2.0-2.1 cannot trace `zip(strict=True)`, so those compile with graph breaks |
 | Native autograd/fake kernels | Requires detected registration and unified-autocast APIs; CPU checked from 2.4 |
 | Native raw-op vmap | Registration is conditional; public transforms retain tensor decompositions |
 | FP32-output mixed CUDA GEMM | Requires the actual ATen overloads; FP32-promotion fallback otherwise |
@@ -84,21 +84,26 @@ unavailable. Other versions/providers may differ. Complex tensor interfaces are
 outside the [ONNX Conv schema](https://onnx.ai/onnx/operators/onnx__Conv.html);
 provide an explicit real/imaginary model interface when required.
 
-Three upstream defects are tied to specific releases. The version contract
-detects each one rather than hiding it:
+Three upstream defects are tied to specific releases. This package works around
+the first two, and the version contract covers all three:
 
-- PyTorch 2.6's Dynamo exporter gives every bias-free 3-D convolution, stock
-  `Conv3d` included, a `[C_out, 2]` zero bias. ONNX requires a 1-D bias, and ONNX
-  Runtime 1.31 rejects the graph (1.23 ignored it). Rank-4 layers on CPU and CUDA
-  decompose into such convolutions, so on 2.6 export with `dynamo=False`.
-- On Python 3.14, TorchScript in PyTorch 2.9 cannot script modules at all, stock
-  `Linear` included: it reads `__annotations__` from instances, which Python 3.14
-  no longer provides. Use PyTorch 2.10 or later to script on Python 3.14.
+- onnxscript's `conv3d` translation, which PyTorch 2.6's Dynamo exporter uses,
+  gives every bias-free 3-D convolution a `[C_out, 2]` zero bias copied from its
+  complex variant. ONNX requires a 1-D bias, and ONNX Runtime 1.31 rejects the
+  graph (1.23 ignored it). Rank-4 layers on CPU and CUDA decompose into such
+  convolutions. `export_onnx` supplies a correct translation, so its exports run,
+  stock `Conv3d` layers in the same model included; a direct `torch.onnx.export`
+  on 2.6 remains affected.
+- On Python 3.14, TorchScript in PyTorch 2.9 reads `__annotations__` from module
+  instances, which Python 3.14 provides only for an explicit class attribute, so
+  even stock `Linear` cannot be scripted. This package's layers declare one and
+  script there; models with affected stock layers need PyTorch 2.10 or later.
 - PyTorch 2.4.1 on Windows computes wrong stock `conv3d` gradients for grouped,
   dilated float64 problems on AMD CPUs (Zen 3 and Zen 5 runners), while Intel CPUs
   and Linux on the same AMD CPUs are correct. Ranks 3 and 4 inherit it there. The
   contract records an expected failure only after checking stock `conv3d` itself
-  on the same geometry. Use a later PyTorch on such hosts.
+  on the same geometry, and reports which ingredients matter. Use a later PyTorch
+  on such hosts.
 
 Default rank-2/3 vendor paths inherit PyTorch's empty-vmap behavior and layout
 selection. The raw native rule preserves the logical inner batch for empty maps;

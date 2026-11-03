@@ -8,6 +8,7 @@ from torch.nn import functional as F
 from . import _build
 from ._compat import (
     HAS_LIBRARY,
+    HAS_NATIVE_VMAP,
     HAS_UNIFIED_AUTOCAST,
     autocast_dtype,
     is_autocast_enabled,
@@ -16,6 +17,7 @@ from ._compat import (
     transforms_active,
 )
 from ._decomposition import composite_conv, conv4d_taps
+from ._geometry import any_true
 from ._layout import restore_native_layout
 from ._toolchain import native_unavailable_reason
 
@@ -25,6 +27,14 @@ _REGISTRATION_LOCK = threading.Lock()
 
 
 def _transforms_active():
+    """Whether a functorch transform or forward-mode AD may wrap the inputs.
+
+    Dynamo before native vmap rules (PyTorch 2.5) cannot evaluate the functorch probe
+    in a graph, and a traced vmap could reach a kernel without a batching rule. Compiled
+    graphs there assume a transform and keep the portable path, valid under all of them.
+    """
+    if not HAS_NATIVE_VMAP and is_compiling():
+        return True
     return transforms_active()
 
 
@@ -34,7 +44,7 @@ def _portable_kernel(input, weight, bias, stride, padding, dilation, groups, wor
         weight.ndim == 6
         and input.device.type in {"cpu", "cuda", "meta"}
         and padding[0] <= input.shape[2]
-        and all(value <= 2**31 - 1 for value in (*stride, *padding, *dilation))
+        and not any_true([value > 2**31 - 1 for value in (*stride, *padding, *dilation)])
     ):
         return conv4d_taps(input, weight, bias, stride, padding, dilation, groups)
     return composite_conv(input, weight, bias, stride, padding, dilation, groups, workspace_bytes)
@@ -44,7 +54,7 @@ def _portable_conv(input, weight, bias, stride, padding, dilation, groups, works
     """Cast AMP operands once, rather than once per 3D kernel slice."""
     if input.device.type in {"cpu", "cuda"} and is_autocast_enabled(input.device.type):
         dtype = autocast_dtype(input.device.type)
-        castable = {torch.float16, torch.bfloat16, torch.float32}
+        castable = (torch.float16, torch.bfloat16, torch.float32)
         input = input.to(dtype) if input.dtype in castable else input
         weight = weight.to(dtype) if weight.dtype in castable else weight
         bias = bias.to(dtype) if bias is not None and bias.dtype in castable else bias
@@ -139,7 +149,7 @@ def convolution(
         # same mathematics without requiring an optional native compiler.
         backend = "torch"
         parameters = stride, padding, dilation, groups, workspace_bytes, backend
-    if input.is_complex():
+    if input.dtype.is_complex:
         if input.device.type in {"cpu", "cuda"}:
             with torch.autocast(device_type=input.device.type, enabled=False):
                 return _complex_parts(input, weight, bias, parameters)

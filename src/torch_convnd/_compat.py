@@ -24,12 +24,20 @@ def has_fp32_output_gemm() -> bool:
     return True
 
 
+# Resolved at import: Dynamo before PyTorch 2.3 cannot compare a module with None.
+_COMPILER_IS_COMPILING = callable(getattr(getattr(torch, "compiler", None), "is_compiling", None))
+_HAS_DYNAMO = hasattr(torch, "compile")
+
+
 def is_compiling() -> bool:
-    compiler = getattr(torch, "compiler", None)
-    if compiler is not None and hasattr(compiler, "is_compiling"):
-        return compiler.is_compiling()
-    dynamo = getattr(torch, "_dynamo", None)
-    return bool(dynamo is not None and dynamo.is_compiling())
+    if _COMPILER_IS_COMPILING:
+        return torch.compiler.is_compiling()
+    if not _HAS_DYNAMO:
+        return False
+    # PyTorch 2.0-2.2: every compilation has imported Dynamo already.
+    from torch import _dynamo
+
+    return _dynamo.is_compiling()
 
 
 def assume_constant_result(function):
@@ -114,5 +122,9 @@ def transforms_active() -> bool:
 
 
 def is_onnx_exporting() -> bool:
+    """Whether the legacy, tracing exporter runs; Dynamo-based export never sets this."""
+    if is_compiling():
+        # Dynamo before PyTorch 2.3 cannot compare the torch.onnx module with None.
+        return False
     onnx = getattr(torch, "onnx", None)
     return bool(onnx is not None and onnx.is_in_onnx_export())

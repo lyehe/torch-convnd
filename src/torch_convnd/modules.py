@@ -6,7 +6,7 @@ from collections.abc import Sequence
 import torch
 from torch import Tensor, nn
 
-from ._geometry import DEFAULT_WORKSPACE_BYTES, _tuple
+from ._geometry import DEFAULT_WORKSPACE_BYTES, _tuple, has_rank
 from ._padding import padding_pairs
 from .functional import (
     _PADDING_MODES,
@@ -102,7 +102,7 @@ class ConvNd(nn.Module):
             nn.init.uniform_(self.bias, -1 / math.sqrt(fan_in), 1 / math.sqrt(fan_in))
 
     def _check_input(self, input: Tensor) -> None:
-        if input.ndim not in {self.dimensions + 1, self.dimensions + 2}:
+        if not has_rank(input.ndim, self.dimensions):
             message = (
                 f"expected {self.dimensions + 1} unbatched or "
                 f"{self.dimensions + 2} batched dimensions, got {input.ndim}"
@@ -425,7 +425,7 @@ def _spatial(shape: Sequence[int], rank: int) -> tuple[int, ...]:
 
 def _all_valid(output: Tensor, rank: int, channels: int) -> Tensor:
     """The update mask of an output whose samples are all valid: a broadcast view of ones."""
-    if output.ndim not in {rank + 1, rank + 2}:
+    if not has_rank(output.ndim, rank):
         message = (
             f"the {output.ndim}-dimensional output has lost the {rank} spatial axes "
             "a validity mask describes"

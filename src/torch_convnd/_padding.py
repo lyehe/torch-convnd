@@ -3,13 +3,15 @@
 import torch
 from torch.nn import functional as F
 
+from ._geometry import any_true
+
 
 def padding_pairs(padding, kernel, stride, dilation):
     """Resolve PyTorch's integer or string padding to left/right pairs."""
     if isinstance(padding, str):
         if padding not in {"same", "valid"}:
             raise ValueError(f"Invalid padding string {padding!r}; expected 'same' or 'valid'")
-        if padding == "same" and any(step != 1 for step in stride):
+        if padding == "same" and any_true([step != 1 for step in stride]):
             raise ValueError("padding='same' is not supported for strided convolutions")
         return tuple(
             (total // 2, total - total // 2)
@@ -23,7 +25,7 @@ def padding_pairs(padding, kernel, stride, dilation):
 
 def apply_padding(input, pairs, mode):
     """Apply zero, reflection, replication or circular padding over N axes."""
-    if not any(left or right for left, right in pairs):
+    if not any_true([left or right for left, right in pairs]):
         return input
     if mode == "zeros":
         return F.pad(input, tuple(v for pair in reversed(pairs) for v in pair))
