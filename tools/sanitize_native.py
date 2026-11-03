@@ -31,7 +31,6 @@ def main() -> int:
         kwargs["name"] = f"{kwargs['name']}_sanitized"
         kwargs["extra_cflags"] = [*kwargs.get("extra_cflags", []), *COMPILE]
         kwargs["extra_ldflags"] = [*kwargs.get("extra_ldflags", []), SANITIZERS]
-        kwargs["verbose"] = True  # the compile commands show the flags in the log
         built.append(kwargs["name"])
         return build(*args, **kwargs)
 
@@ -44,7 +43,14 @@ def main() -> int:
     if "libasan" not in Path("/proc/self/maps").read_text():
         print("The ASan runtime is not loaded; preload libasan", file=sys.stderr)
         return 1
-    print(f"Sanitized native builds: {', '.join(built)}")
+    for name in built:
+        # pytest captures the build log, so read the flags from the build file itself.
+        rules = Path(cpp_extension._get_build_directory(name, verbose=False)) / "build.ninja"
+        flags = [line for line in rules.read_text().splitlines() if line.startswith("cflags")]
+        if not flags or SANITIZERS not in flags[0]:
+            print(f"{name} was not compiled with {SANITIZERS}", file=sys.stderr)
+            return 1
+        print(f"{name}: {flags[0]}")
     return int(status)
 
 
