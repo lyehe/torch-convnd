@@ -1,5 +1,7 @@
 """Feature detection at PyTorch boundaries; no version-string dispatch."""
 
+import contextlib
+
 import torch
 
 _library = getattr(torch, "library", None)
@@ -48,6 +50,55 @@ def is_autocast_enabled(device_type: str) -> bool:
     if device_type == "cpu":
         return torch.is_autocast_cpu_enabled()
     return torch.is_autocast_enabled() if device_type == "cuda" else False
+
+
+def plain_tensor(tensor) -> bool:
+    """A real eager tensor: no subclass, no Python dispatch or function mode, no transform.
+
+    Values derived under fake, meta-tracing or other modes, or inside functorch
+    transforms (whose wrapped tensors look like plain ones), must not outlive them.
+    """
+    dispatch = getattr(torch._C, "_len_torch_dispatch_stack", None)
+    function = getattr(torch._C, "_is_torch_function_mode_enabled", None)
+    return (
+        type(tensor) is torch.Tensor
+        and (dispatch is None or dispatch() == 0)
+        and (function is None or not function())
+        and not transforms_active()
+    )
+
+
+def current_stream_id(device: torch.device):
+    """A hashable identity of the current CUDA stream on this device; None elsewhere."""
+    if device.type != "cuda":
+        return None
+    raw = getattr(torch._C, "_cuda_getCurrentRawStream", None)  # avoids building a Stream
+    return raw(device.index) if raw is not None else torch.cuda.current_stream(device).cuda_stream
+
+
+def is_capturing(device: torch.device) -> bool:
+    """Whether CUDA graph capture is recording on this device's current stream."""
+    capturing = getattr(torch.cuda, "is_current_stream_capturing", None)
+    return device.type == "cuda" and capturing is not None and capturing()
+
+
+@assume_constant_result
+def _autocast_probe(device_type: str) -> bool:
+    amp = getattr(torch, "amp", None)
+    probe = getattr(getattr(amp, "autocast_mode", None), "is_autocast_available", None)
+    return HAS_UNIFIED_AUTOCAST and probe is not None and probe(device_type)
+
+
+def autocast_available(device_type: str) -> bool:
+    """Whether autocast supports this device type; probed only beyond CPU and CUDA."""
+    return device_type in {"cpu", "cuda"} or _autocast_probe(device_type)
+
+
+def autocast_disabled(device_type: str):
+    """Leave an active autocast region on this device type; a no-op context otherwise."""
+    if autocast_available(device_type) and is_autocast_enabled(device_type):
+        return torch.autocast(device_type, enabled=False)
+    return contextlib.nullcontext()
 
 
 def autocast_dtype(device_type: str):

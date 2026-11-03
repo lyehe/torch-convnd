@@ -96,7 +96,9 @@ jobs:
 
   versions:
     name: PyTorch ${{ matrix.torch }} compatibility
-    runs-on: ubuntu-latest
+    # PyTorch 1.11-1.12 wheels request an executable stack, which the glibc of
+    # ubuntu-latest (26.04) refuses to load; they stay on 24.04.
+    runs-on: ${{ contains(fromJSON('["1.11.0", "1.12.1"]'), matrix.torch) && 'ubuntu-24.04' || 'ubuntu-latest' }}
     timeout-minutes: 30
     strategy:
       fail-fast: false

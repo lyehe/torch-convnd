@@ -1,5 +1,34 @@
 # Changelog
 
+## Unreleased
+
+- Add NVIDIA's partial convolution at every rank and backend: `PartialConvNd`,
+  `PartialConv1d`-`PartialConv4d` and `partial_conv_nd`, with `multi_channel`,
+  stock-compatible state dictionaries, grouped mask counts, masks padded like the
+  input, and counts computed in float32 outside autocast. Tracing, `torch.compile` and
+  ONNX export are supported; TorchScript is refused explicitly.
+- Add `padding_mode="partial"` to `ConvNd`, the fixed-rank layers and `conv_nd`:
+  partial-convolution border rescaling with unchanged weights and call signature.
+- Return `PartialConvOutput(output, mask)` from `partial_conv_nd` and, when requested,
+  from partial layers; `return_mask` set at construction is a default each call can
+  override. Masks follow a documented contract: any real dtype, broadcastable batch
+  and spatial sizes, and validated shapes.
+- Add `PartialSequential`, which carries the mask through partial layers and
+  position-wise modules, refuses modules that would lose or misplace it, keeps
+  mask-free layers on the fast path, and reports the last layer's update layout.
+- Without a mask, copying padding modes and unpadded layers run as an ordinary
+  convolution, and zero padding uses exact per-axis counts computed on the device
+  instead of a counting convolution: no host copy or synchronization, and symbolic
+  sizes stay symbolic under `torch.compile` and `torch.export`. Eager calls cache short
+  per-axis vectors and small finished scales per geometry and CUDA stream; functorch
+  transforms, compilers, CUDA graph capture and fake or mode-dispatched tensors bypass
+  the cache. Rescaling and bias share one fused pass, grouped counts are applied
+  through views, and modules build the update mask only when they return it. Windows
+  beyond float16's range rescale in float32, and counts leave autocast on every device
+  type that supports it. Both ONNX exporters handle partial layers, including dynamic
+  sizes. The version-compatibility contract covers partial convolution and its ONNX
+  export on every tested PyTorch release.
+
 ## 0.5.0
 
 - Extend portable training and serialization to PyTorch 1.11+ using feature
