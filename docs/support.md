@@ -108,6 +108,15 @@ the first two, and the version contract covers all three:
   on the same geometry, and reports which ingredients matter. Use a later PyTorch
   on such hosts.
 
+One platform defect is independent of the PyTorch release. On GitHub's Windows
+runners with Intel Emerald Rapids CPUs (family 6, model 207), oneDNN's AMX kernels,
+which PyTorch uses for bfloat16 matrix products, fault with an illegal instruction
+at their first tile instruction (`tilezero`): AMX tile state is unusable in those
+virtual machines. CI keeps oneDNN below AMX there with
+`ONEDNN_MAX_CPU_ISA=AVX512_CORE_BF16`; set it on any host that shows this crash. A
+crash dump from PyTorch 2.10 located it. The one earlier illegal-instruction crash,
+with 2.15 on the same runner pool, was probably the same.
+
 Default rank-2/3 vendor paths inherit PyTorch's empty-vmap behavior and layout
 selection. The raw native rule preserves the logical inner batch for empty maps;
 native output strides can differ while values/gradients agree. cuDNN settings

@@ -84,6 +84,14 @@ jobs:
       - name: Keep crash dumps
         if: runner.os == 'Windows'
         run: pwsh tools/crash_dumps.ps1 .artifacts/crash-dumps
+      # oneDNN's AMX kernels fault with an illegal instruction on the Emerald Rapids
+      # Windows runners, where AMX tile state is unusable; stay below AMX there.
+      - name: Keep oneDNN below AMX on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          'ONEDNN_MAX_CPU_ISA=AVX512_CORE_BF16' >> $env:GITHUB_ENV
+          'DNNL_MAX_CPU_ISA=AVX512_CORE_BF16' >> $env:GITHUB_ENV
       - run: python -m pytest -q --cov --cov-report=xml --junitxml=.artifacts/correctness.xml
       - run: python benchmarks/summarize_tests.py --junit .artifacts/correctness.xml --output .artifacts/correctness.json
       - run: python -m build
@@ -207,6 +215,12 @@ jobs:
       - name: Keep crash dumps
         if: runner.os == 'Windows'
         run: pwsh tools/crash_dumps.ps1 .artifacts/crash-dumps
+      - name: Keep oneDNN below AMX on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          'ONEDNN_MAX_CPU_ISA=AVX512_CORE_BF16' >> $env:GITHUB_ENV
+          'DNNL_MAX_CPU_ISA=AVX512_CORE_BF16' >> $env:GITHUB_ENV
       # The MPS checks run wherever the runner and this PyTorch expose MPS.
       - run: python -m pytest tests/test_version_compatibility.py tests/test_native_compatibility.py tests/test_mps.py -q --junitxml=.artifacts/version.xml
       - name: Run generic 6D example

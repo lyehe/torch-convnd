@@ -65,7 +65,11 @@
   2.10's Windows wheels do not).
 - Keep minidumps of interpreter crashes in Windows CI and upload them with the built
   addon when a job fails (`tools/crash_dumps.ps1`); each job first confirms that its
-  runner writes dumps.
+  runner writes dumps. Runner processes inherit `SEM_NOGPFAULTERRORBOX`, which keeps
+  Windows Error Reporting from writing dumps, so the test session clears it there.
+- Explain the Windows CI illegal-instruction crash: on GitHub's Emerald Rapids
+  Windows runners, oneDNN's AMX bfloat16 kernels fault at their first tile
+  instruction. CI keeps oneDNN below AMX there (`ONEDNN_MAX_CPU_ISA`).
 - Export bias-free 3-D convolutions that ONNX Runtime accepts. onnxscript's `conv3d`
   translation, used by PyTorch 2.6's Dynamo exporter, writes a `[C_out, 2]` zero bias
   copied from its complex variant; `export_onnx` now supplies a correct one, which
