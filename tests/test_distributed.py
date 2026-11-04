@@ -12,7 +12,7 @@ from torch_convnd import ConvNd, PartialConvNd
 
 
 def gloo_device_available():
-    """Some builds, such as PyTorch's Windows wheels, ship Gloo without a transport."""
+    """Some builds, such as PyTorch 2.10's Windows wheels, ship Gloo without a transport."""
     if not dist.is_available() or not dist.is_gloo_available():
         return False
     try:

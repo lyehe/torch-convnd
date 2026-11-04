@@ -75,9 +75,9 @@ each runner's CPU model. Its CUDA build check proves that the kernels compile an
 register, not that they run. The CUDA workflow is manual and
 requires a trusted self-hosted runner with a matching toolkit; its PyTorch version,
 CUDA wheel index and Python are selectable. The suite checks two-process
-data-parallel gradients on CPU with Gloo on Linux and macOS; PyTorch's Windows
-wheels ship Gloo without a transport. CI does not claim multi-node, NCCL or CUDA
-Graph coverage.
+data-parallel gradients on CPU with Gloo on Linux, macOS and Windows, and skips
+where a PyTorch build has no Gloo transport, as with PyTorch 2.10's Windows wheels
+(2.15's have one). CI does not claim multi-node, NCCL or CUDA Graph coverage.
 
 ## Export and reference differences
 

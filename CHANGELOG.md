@@ -61,8 +61,8 @@
   padding mode, and natively against the portable backend beyond CUDA's per-rank
   kernels. Also test inductor compilation of rank-5 native and partial layers, ONNX
   Runtime execution at rank 5 with partial layers, and two-process data-parallel
-  gradients over Gloo where PyTorch provides a Gloo transport (its Windows wheels
-  do not).
+  gradients over Gloo where the PyTorch build provides a Gloo transport (PyTorch
+  2.10's Windows wheels do not).
 - Keep minidumps of interpreter crashes in Windows CI and upload them with the built
   addon when a job fails (`tools/crash_dumps.ps1`); each job first confirms that its
   runner writes dumps.
