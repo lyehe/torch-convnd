@@ -144,6 +144,48 @@ def test_matches_nvidia_arithmetic_with_gradients(rank, multi_channel, use_bias,
         torch.testing.assert_close(left, right, rtol=1e-11, atol=1e-11)
 
 
+@pytest.mark.parametrize("multi_channel", [False, True])
+def test_rank_limit_matches_the_rank_one_reference(multi_channel):
+    """Masked counts, per group too, reach PyTorch's 64-axis limit."""
+    generator = torch.Generator().manual_seed(62)
+    trivial = (1,) * 61
+    input = torch.randn((2, 4, *trivial, 7), dtype=torch.float64, generator=generator)
+    weight = torch.randn((6, 2, *trivial, 3), dtype=torch.float64, generator=generator)
+    bias = torch.randn(6, dtype=torch.float64, generator=generator)
+    mask = binary_mask((2, 4 if multi_channel else 1, 7), generator)
+    leaves = [input.requires_grad_(), weight.requires_grad_(), bias.requires_grad_()]
+    output, update = partial_conv_nd(
+        input,
+        weight,
+        bias,
+        padding=(0,) * 61 + (1,),
+        groups=2,
+        mask=mask.reshape(2, -1, *trivial, 7),
+        multi_channel=multi_channel,
+        backend="torch",
+    )
+    expected, expected_update = nvidia_reference(
+        input.reshape(2, 4, 7),
+        mask,
+        weight.reshape(6, 2, 3),
+        bias,
+        (1,),
+        (1,),
+        (1,),
+        2,
+        multi_channel,
+    )
+    assert output.shape == (2, 6, *trivial, 7)
+    torch.testing.assert_close(output.reshape(2, 6, 7), expected, rtol=1e-12, atol=1e-12)
+    torch.testing.assert_close(update.reshape(2, -1, 7), expected_update, rtol=0, atol=0)
+    assert (expected_update == 0).any(), "the large hole must empty some windows"
+    probe = torch.randn(expected.shape, dtype=torch.float64, generator=generator)
+    actual = torch.autograd.grad((output.reshape(2, 6, 7) * probe).sum(), leaves)
+    reference = torch.autograd.grad((expected * probe).sum(), leaves)
+    for left, right in zip(actual, reference, strict=True):
+        torch.testing.assert_close(left, right, rtol=1e-11, atol=1e-11)
+
+
 @pytest.mark.parametrize("rank", [2, 4])
 @pytest.mark.parametrize("multi_channel", [False, True])
 def test_no_mask_is_partial_convolution_padding(rank, multi_channel):
