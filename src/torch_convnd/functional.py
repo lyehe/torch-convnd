@@ -504,7 +504,12 @@ def _partial_conv_nd(
         if multi_channel:
             # Each output channel counts its own group's channels, as a grouped
             # all-ones convolution would; summing them first keeps the count depthwise.
-            valid = valid.reshape(mask.shape[0], groups, per_group, *spatial).sum(2)
+            shape = (mask.shape[0], groups, per_group)
+            if rank == 62:
+                # A group axis would pass PyTorch's 64 dimensions: sum over flat space.
+                valid = valid.reshape(*shape, -1).sum(2).reshape(*shape[:2], *spatial)
+            else:
+                valid = valid.reshape(*shape, *spatial).sum(2)
         window = math.prod(kernel) * (per_group if multi_channel else 1)
     # The data convolution validates the geometry before the counts reuse it.
     data = input if mask is None else input * cast
@@ -545,6 +550,10 @@ def _partial_conv_nd(
         ratio, update = _scale(counts, window, ratio_dtype, level)
     batch, out_channels = output.shape[0], output.shape[1]
     grouped = update.shape[1] > 1
+    if grouped and rank == 62:
+        # A group axis would pass PyTorch's 64 dimensions: copy the counts per channel.
+        ratio, update = (t.repeat_interleave(out_channels // groups, 1) for t in (ratio, update))
+        grouped = False
     if grouped:
         # Per-group counts: view the output by group instead of copying them per channel.
         output = output.reshape(batch, groups, out_channels // groups, *output.shape[2:])
