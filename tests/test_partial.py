@@ -1,5 +1,6 @@
 """Partial convolution against an independent transcription of NVIDIA's partialconv."""
 
+import functools
 import math
 
 import numpy as np
@@ -82,6 +83,24 @@ def nvidia_reference(input, mask, weight, bias, stride, padding, dilation, group
     return ((raw + view - view) * ratio + view) * update, update
 
 
+def copy_pad(tensor, pairs, mode):
+    """F.pad's copying modes for any number of spatial axes, by indexing each axis."""
+    for axis, (left, right) in enumerate(pairs, start=2):
+        if not left and not right:
+            continue
+        size = tensor.shape[axis]
+        index = torch.arange(-left, size + right)
+        if mode == "reflect":
+            index = index.abs()
+            index = torch.where(index >= size, 2 * (size - 1) - index, index)
+        elif mode == "replicate":
+            index = index.clamp(0, size - 1)
+        else:
+            index = index % size
+        tensor = tensor.index_select(axis, index)
+    return tensor
+
+
 def binary_mask(shape, generator, holes=0.3):
     """Random holes plus one large hole, so some windows see no valid sample."""
     mask = (torch.rand(shape, generator=generator) > holes).double()
@@ -137,6 +156,58 @@ def test_matches_nvidia_arithmetic_with_gradients(rank, multi_channel, use_bias,
     torch.testing.assert_close(update, expected_update.expand_as(update), rtol=0, atol=0)
     assert update.shape[1] == (6 if multi_channel else 1)
     assert (expected_update == 0).any(), "the large hole must empty some windows"
+    probe = torch.randn(expected.shape, dtype=torch.float64, generator=generator)
+    actual = torch.autograd.grad((output * probe).sum(), leaves)
+    reference = torch.autograd.grad((expected * probe).sum(), leaves)
+    for left, right in zip(actual, reference, strict=True):
+        torch.testing.assert_close(left, right, rtol=1e-11, atol=1e-11)
+
+
+@pytest.mark.parametrize("rank", [5, 9])
+@pytest.mark.parametrize("mode", ["zeros", "reflect", "replicate", "circular"])
+@pytest.mark.parametrize("multi_channel", [False, True])
+def test_high_ranks_match_nvidia_arithmetic_in_every_padding_mode(rank, mode, multi_channel):
+    """Ranks beyond the stock layers follow NVIDIA's formulation, padding included."""
+    generator = torch.Generator().manual_seed(rank * 10 + 3)
+    size, kernel, padding = [1] * rank, [1] * rank, [0] * rank
+    for axis, length, taps in ((0, 5, 3), (rank // 2, 4, 2), (rank - 1, 6, 3)):
+        size[axis], kernel[axis], padding[axis] = length, taps, 1
+    input = torch.randn((2, 4, *size), dtype=torch.float64, generator=generator)
+    weight = torch.randn((6, 2, *kernel), dtype=torch.float64, generator=generator)
+    bias = torch.randn(6, dtype=torch.float64, generator=generator)
+    mask = binary_mask((2, 4 if multi_channel else 1, *size), generator)
+    leaves = [input.requires_grad_(), weight.requires_grad_(), bias.requires_grad_()]
+    output, update = partial_conv_nd(
+        input,
+        weight,
+        bias,
+        padding=padding,
+        groups=2,
+        mask=mask,
+        multi_channel=multi_channel,
+        padding_mode=mode,
+        backend="torch",
+    )
+    ones = (1,) * rank
+    if mode == "zeros":
+        expected, expected_update = nvidia_reference(
+            input, mask, weight, bias, ones, padding, ones, 2, multi_channel
+        )
+    else:
+        pairs = [(value, value) for value in padding]
+        expected, expected_update = nvidia_reference(
+            copy_pad(input, pairs, mode),
+            copy_pad(mask, pairs, mode),
+            weight,
+            bias,
+            ones,
+            (0,) * rank,
+            ones,
+            2,
+            multi_channel,
+        )
+    torch.testing.assert_close(output, expected, rtol=1e-12, atol=1e-12)
+    torch.testing.assert_close(update, expected_update.expand_as(update), rtol=0, atol=0)
     probe = torch.randn(expected.shape, dtype=torch.float64, generator=generator)
     actual = torch.autograd.grad((output * probe).sum(), leaves)
     reference = torch.autograd.grad((expected * probe).sum(), leaves)
@@ -421,7 +492,7 @@ def test_mask_free_layers_export_strictly_with_dynamic_sizes():
         torch.testing.assert_close(program.module()(input), layer(input))
 
 
-@pytest.mark.parametrize("rank", [2, 3])
+@pytest.mark.parametrize("rank", [2, 3, 5])
 def test_onnx_export_runs_in_onnx_runtime(rank, tmp_path):
     """Masked and mask-free partial layers export as standard ONNX nodes."""
     onnx = pytest.importorskip("onnx")
@@ -429,7 +500,11 @@ def test_onnx_export_runs_in_onnx_runtime(rank, tmp_path):
     pytest.importorskip("onnxscript")
     from torch_convnd import export_onnx
 
-    factory = {2: PartialConv2d, 3: PartialConv3d}[rank]
+    factory = {
+        2: PartialConv2d,
+        3: PartialConv3d,
+        5: functools.partial(PartialConvNd, dimensions=5),
+    }[rank]
     layer = factory(4, 6, 3, padding=1, groups=2, multi_channel=True, backend="torch").eval()
     input = torch.randn((2, 4) + (5,) * rank)
     mask = (torch.rand((2, 4) + (5,) * rank) > 0.3).float()
@@ -866,6 +941,38 @@ def test_fake_tensor_forwards_leave_the_cache_untouched():
     eager, _ = partial_conv_nd(input, weight, bias, padding=1)
     expected, _ = nvidia_reference(input, None, weight, bias, (1, 1), (1, 1), (1, 1), 1, False)
     torch.testing.assert_close(eager, expected)
+
+
+def test_counting_kernels_are_reused_only_by_plain_eager_calls():
+    """Masked eager calls share one counting kernel; fake tensors, transforms and
+    compilers build their own, so nothing they create outlives them."""
+    fake = pytest.importorskip("torch._subclasses.fake_tensor")
+    functional_module._cached_ones.cache_clear()
+    input, weight = torch.randn(2, 2, 6, 6), torch.randn(3, 2, 3, 3)
+    mask = (torch.rand(2, 1, 6, 6) > 0.3).float()
+
+    def masked(input, mask):
+        return partial_conv_nd(input, weight, padding=1, mask=mask, backend="torch").output
+
+    with fake.FakeTensorMode() as mode:
+        partial_conv_nd(
+            mode.from_tensor(input),
+            mode.from_tensor(weight),
+            padding=1,
+            mask=mode.from_tensor(mask),
+            backend="torch",
+        )
+    torch.func.vmap(masked)(input.unsqueeze(1), mask.unsqueeze(1))
+    if hasattr(torch, "compile"):
+        torch._dynamo.reset()
+        torch.compile(masked, backend="aot_eager", fullgraph=True)(input, mask)
+    assert functional_module._cached_ones.cache_info().currsize == 0
+    first, second = masked(input, mask), masked(input, mask)
+    information = functional_module._cached_ones.cache_info()
+    assert (information.misses, information.hits, information.currsize) == (1, 1, 1)
+    expected, _ = nvidia_reference(input, mask, weight, None, (1, 1), (1, 1), (1, 1), 1, False)
+    torch.testing.assert_close(first, expected, rtol=1e-6, atol=1e-6)
+    assert torch.equal(first, second)
 
 
 def test_functorch_transforms_leave_the_cache_untouched():

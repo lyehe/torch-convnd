@@ -39,6 +39,7 @@ CPU times in milliseconds:
 Auto improves over forcing the native addon by approximately 11-33 times on
 these CPU cases. The rank-4 portable path batches one axis through vendor Conv3d,
 retaining unrestricted full 4D weights. Lower ranks call vendor kernels directly.
+These native CPU timings predate the [parallel kernels](#parallel-native-cpu-kernels).
 
 CUDA times in milliseconds. Small 4D is `[1,4,8,8,8,16]` with 8 output channels;
 medium 4D is `[1,8,16,16,16,32]` with 16 output channels.
@@ -57,6 +58,33 @@ The medium FP32 auto case is about 1.5 times faster than the portable 4D path;
 the FP16 AMP case is about 3.1 times faster. The BF16 case has a smaller gain.
 Shape, workspace, hardware, cuDNN settings and precision can change the ranking;
 auto is a measured policy, not runtime autotuning or a universal optimum.
+
+## Parallel native CPU kernels
+
+The native CPU kernels used to run on one thread. Under PyTorch's default OpenMP
+backend, `at::parallel_for` in an extension compiled without OpenMP flags is a
+plain loop; each element's position was also decoded by integer division on every
+axis. They now take their ranges from `TensorIterator`, which runs on PyTorch's
+intra-op threads, and step through positions; axes with one sample, a one-tap
+kernel and no padding are skipped. Values and gradients are bitwise unchanged.
+CPU times in milliseconds, same method and host, four threads:
+
+| Input shape / output channels | Native before | Native now | PyTorch backend | Auto now |
+| --- | --- | --- | --- | --- |
+| `[1,4,32,32]` / 8 | 8.21 | 0.90 | 0.41 | 0.40 |
+| `[1,4,8,8,8]` / 8 | 15.05 | 0.85 | 0.48 | 0.54 |
+| `[1,2,4,4,4,8]` / 4 | 25.36 | 1.13 | 2.06 | 2.14 |
+| `[1,2,6,6,6,6,6]` / 4 | 1320.24 | 14.57 | 80.91 | 15.04 |
+| `[1,2,4,4,4,4,4,4]` / 4 | 2033.38 | 26.69 | 140.99 | 26.28 |
+
+Auto selects the native kernels for CPU ranks 5-62. Before the change it took 1342
+and 1995 ms on the rank-5 and rank-6 cases, 14-17 times slower than the PyTorch
+backend; it is now 5.3-5.4 times faster. In a spot check with 8-32 channels, rank-5
+and rank-6 problems ran 1.7-4.3 times faster natively. At rank 4 the batched Conv3d
+taps that auto uses stayed 1.5-9 times faster than native for 4-32 channels, except
+on the smallest case above, so the rank-4 policy is unchanged. Raw records:
+[serial kernels](assets/reports/backends_cpu_native_serial.json),
+[parallel kernels](assets/reports/backends_cpu_native_parallel.json).
 
 ## Memory and mixed-precision backward
 

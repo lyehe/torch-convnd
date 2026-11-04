@@ -1,7 +1,7 @@
 #include "convnd.h"
 
 #include <ATen/Dispatch.h>
-#include <ATen/Parallel.h>
+#include <ATen/TensorIterator.h>
 #include <ATen/autocast_mode.h>
 #include <c10/core/DeviceGuard.h>
 #include <torch/library.h>
@@ -131,38 +131,172 @@ std::vector<int64_t> output_shape(const at::Tensor& input, const Geometry& geome
   return result;
 }
 
+// Row-major coordinates of a flat index.
+void decode(int64_t index, const int64_t* sizes, int64_t rank, int64_t* coordinates) {
+  for (int64_t axis = rank - 1; axis >= 0; --axis) {
+    coordinates[axis] = index % sizes[axis];
+    index /= sizes[axis];
+  }
+}
+
+// Steps row-major coordinates from `axis` outward; true when they wrap around to zero.
+bool advance(const int64_t* sizes, int64_t axis, int64_t* coordinates) {
+  for (; axis >= 0; --axis) {
+    if (++coordinates[axis] < sizes[axis]) return false;
+    coordinates[axis] = 0;
+  }
+  return true;
+}
+
+// Runs body(begin, end) over ranges of a contiguous tensor's elements in parallel. With
+// PyTorch's default OpenMP backend, at::parallel_for in an extension built without OpenMP
+// flags runs serially; TensorIterator's loop runs on PyTorch's own threads instead and
+// follows torch.set_num_threads.
+template <typename Body>
+void parallel_ranges(const at::Tensor& tensor, int64_t grain_size, const Body& body) {
+  const auto flat = tensor.view({-1});
+  auto iterator = at::TensorIteratorConfig()
+                      .add_output(flat)
+                      .resize_outputs(false)
+                      .check_all_same_dtype(false)
+                      .build();
+  const char* base = static_cast<const char*>(flat.const_data_ptr());
+  const int64_t element_size = flat.element_size();
+  iterator.for_each(
+      [&](char** data, const int64_t* strides, int64_t length, int64_t rows) {
+        for (int64_t row = 0; row < rows; ++row) {
+          const int64_t begin = (data[0] + row * strides[1] - base) / element_size;
+          body(begin, begin + length);
+        }
+      },
+      grain_size);
+}
+
 }  // namespace
 
-void unfold_cpu(const at::Tensor& input, at::Tensor& columns, const Geometry& geometry,
+// Decoding each element's position divides on every axis, so each range decodes its
+// first element and then steps through positions and taps in order.
+void unfold_cpu(const at::Tensor& input, at::Tensor& columns, const Geometry& full_geometry,
                 int64_t start, int64_t length) {
+  const Geometry geometry = without_unit_axes(full_geometry);
+  const int64_t last = geometry.rank - 1;
+  std::array<int64_t, kMaxSpatialDims> multiplier{};
+  multiplier[last] = 1;
+  for (int64_t axis = last - 1; axis >= 0; --axis) {
+    multiplier[axis] = multiplier[axis + 1] * geometry.input[axis + 1];
+  }
+  std::array<int64_t, kMaxSpatialDims> first{};
+  decode(start, geometry.output, geometry.rank, first.data());
   AT_DISPATCH_FLOATING_TYPES_AND2(at::kHalf, at::kBFloat16, input.scalar_type(),
                                 "unfold_nd_cpu", [&] {
     const scalar_t* source = input.const_data_ptr<scalar_t>();
     scalar_t* target = columns.mutable_data_ptr<scalar_t>();
-    at::parallel_for(0, columns.numel(), 4096, [&](int64_t begin, int64_t end) {
-      for (int64_t index = begin; index < end; ++index) {
-        const int64_t offset = column_input_offset(index / length, start + index % length, geometry);
-        target[index] = offset < 0 ? scalar_t(0) : source[offset];
+    parallel_ranges(columns, 4096, [&](int64_t begin, int64_t end) {
+      int64_t column = begin % length;
+      int64_t channel = begin / length / geometry.kernel_volume;
+      std::array<int64_t, kMaxSpatialDims> tap{};
+      std::array<int64_t, kMaxSpatialDims> position{};
+      decode(begin / length % geometry.kernel_volume, geometry.kernel, geometry.rank, tap.data());
+      decode(start + column, geometry.output, geometry.rank, position.data());
+      for (int64_t index = begin; index < end;) {
+        // Every axis but the last is constant along a run of the last one.
+        int64_t offset = channel * geometry.input_volume;
+        bool inside = true;
+        for (int64_t axis = 0; axis < last; ++axis) {
+          const int64_t coordinate = position[axis] * geometry.stride[axis] -
+              geometry.padding[axis] + tap[axis] * geometry.dilation[axis];
+          inside = inside && coordinate >= 0 && coordinate < geometry.input[axis];
+          offset += coordinate * multiplier[axis];
+        }
+        const int64_t origin = tap[last] * geometry.dilation[last] - geometry.padding[last];
+        const int64_t run =
+            std::min({geometry.output[last] - position[last], length - column, end - index});
+        for (int64_t step = 0; step < run; ++step) {
+          const int64_t coordinate = (position[last] + step) * geometry.stride[last] + origin;
+          target[index + step] = inside && coordinate >= 0 && coordinate < geometry.input[last]
+                                     ? source[offset + coordinate]
+                                     : scalar_t(0);
+        }
+        index += run;
+        column += run;
+        position[last] += run;
+        if (column == length) {
+          // The next row holds the next tap, or the next channel, from the tile's start.
+          column = 0;
+          position = first;
+          if (advance(geometry.kernel, last, tap.data())) ++channel;
+        } else if (position[last] == geometry.output[last]) {
+          position[last] = 0;
+          advance(geometry.output, last - 1, position.data());
+        }
       }
     });
   });
 }
 
-void fold_cpu(const at::Tensor& columns, at::Tensor& output, const Geometry& geometry,
+void fold_cpu(const at::Tensor& columns, at::Tensor& output, const Geometry& full_geometry,
               int64_t start, int64_t length) {
+  const Geometry geometry = without_unit_axes(full_geometry);
+  const int64_t last = geometry.rank - 1;
+  std::array<int64_t, kMaxSpatialDims> multiplier{};
+  multiplier[last] = 1;
+  for (int64_t axis = last - 1; axis >= 0; --axis) {
+    multiplier[axis] = multiplier[axis + 1] * geometry.output[axis + 1];
+  }
+  // Where each axis's taps start in the per-element table below.
+  std::array<int64_t, kMaxSpatialDims> first_tap{};
+  int64_t tap_count = 0;
+  for (int64_t axis = 0; axis < geometry.rank; ++axis) {
+    first_tap[axis] = tap_count;
+    tap_count += geometry.kernel[axis];
+  }
   AT_DISPATCH_FLOATING_TYPES(output.scalar_type(), "fold_nd_cpu", [&] {
     const scalar_t* source = columns.const_data_ptr<scalar_t>();
     scalar_t* target = output.mutable_data_ptr<scalar_t>();
-    at::parallel_for(0, output.numel(), 512, [&](int64_t begin, int64_t end) {
+    parallel_ranges(output, 512, [&](int64_t begin, int64_t end) {
+      int64_t channel = begin / geometry.input_volume;
+      std::array<int64_t, kMaxSpatialDims> element{};
+      decode(begin % geometry.input_volume, geometry.input, geometry.rank, element.data());
+      // Per axis and tap: the output coordinate whose window puts that tap on the
+      // element, or a negative value when there is none.
+      std::vector<int64_t> reached(tap_count);
       for (int64_t index = begin; index < end; ++index) {
-        scalar_t sum = 0;
-        for (int64_t tap = 0; tap < geometry.kernel_volume; ++tap) {
-          const int64_t offset = input_column_offset(index, tap, geometry, start, length);
-          if (offset >= 0) {
-            sum += source[offset];
+        for (int64_t axis = 0; axis < geometry.rank; ++axis) {
+          for (int64_t step = 0; step < geometry.kernel[axis]; ++step) {
+            int64_t coordinate =
+                element[axis] + geometry.padding[axis] - step * geometry.dilation[axis];
+            if (coordinate >= 0 && geometry.stride[axis] != 1) {
+              coordinate = coordinate % geometry.stride[axis] == 0
+                               ? coordinate / geometry.stride[axis]
+                               : -1;
+            }
+            reached[first_tap[axis] + step] = coordinate < geometry.output[axis] ? coordinate : -1;
           }
         }
+        // Taps in the per-element map's order, so the sum rounds identically.
+        scalar_t sum = 0;
+        std::array<int64_t, kMaxSpatialDims> tap{};
+        for (int64_t row = channel * geometry.kernel_volume,
+                     rows_end = row + geometry.kernel_volume;
+             row < rows_end;) {
+          int64_t position = 0;
+          bool inside = true;
+          for (int64_t axis = 0; axis < last; ++axis) {
+            const int64_t coordinate = reached[first_tap[axis] + tap[axis]];
+            inside = inside && coordinate >= 0;
+            position += coordinate * multiplier[axis];
+          }
+          for (int64_t step = 0; step < geometry.kernel[last]; ++step, ++row) {
+            const int64_t coordinate = reached[first_tap[last] + step];
+            const int64_t column = position + coordinate - start;
+            if (inside && coordinate >= 0 && column >= 0 && column < length) {
+              sum += source[row * length + column];
+            }
+          }
+          advance(geometry.kernel, last - 1, tap.data());
+        }
         target[index] += sum;
+        if (advance(geometry.input, last, element.data())) ++channel;
       }
     });
   });

@@ -1,16 +1,18 @@
 """Export whole models to standard ONNX nodes and execute them in ONNX Runtime."""
 
+import functools
+
 import numpy as np
 import pytest
 import torch
 
-from torch_convnd import Conv2d, Conv3d, Conv4d, export_onnx
+from torch_convnd import Conv2d, Conv3d, Conv4d, ConvNd, export_onnx
 
 onnx = pytest.importorskip("onnx")
 ort = pytest.importorskip("onnxruntime")
 pytest.importorskip("onnxscript")
 
-FACTORIES = {2: Conv2d, 3: Conv3d, 4: Conv4d}
+FACTORIES = {2: Conv2d, 3: Conv3d, 4: Conv4d, 5: functools.partial(ConvNd, dimensions=5)}
 
 
 def session_for(path):
@@ -22,7 +24,7 @@ def session_for(path):
     return ort.InferenceSession(str(path), sess_options=options, providers=["CPUExecutionProvider"])
 
 
-@pytest.mark.parametrize("rank", [2, 3, 4])
+@pytest.mark.parametrize("rank", [2, 3, 4, 5])
 @pytest.mark.parametrize("backend", ["auto", "native", "torch"])
 @pytest.mark.parametrize("mode", ["zeros", "reflect", "replicate", "circular"])
 def test_onnx_network_runtime(rank, backend, mode, tmp_path):

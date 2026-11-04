@@ -60,7 +60,8 @@ loaded. Tools and environment probes are cached for a process.
 
 Native and portable kernels retain the same full weight tensor. No backend is
 claimed to be fastest for every shape or device. The [measurements](PERFORMANCE.md)
-show speed and memory tradeoffs, including native workspace costs.
+show speed and memory tradeoffs, including native workspace costs. The native CPU
+kernels run on PyTorch's intra-op threads, so they follow `torch.set_num_threads`.
 
 ## Verification status
 
@@ -73,14 +74,16 @@ Apple MPS on the macOS runners' paravirtualized GPU; `torch-convnd-info` records
 each runner's CPU model. Its CUDA build check proves that the kernels compile and
 register, not that they run. The CUDA workflow is manual and
 requires a trusted self-hosted runner with a matching toolkit; its PyTorch version,
-CUDA wheel index and Python are selectable. CI does not claim distributed
-multi-process or CUDA Graph coverage.
+CUDA wheel index and Python are selectable. The suite checks two-process
+data-parallel gradients on CPU with Gloo on Linux and macOS; PyTorch's Windows
+wheels ship Gloo without a transport. CI does not claim multi-node, NCCL or CUDA
+Graph coverage.
 
 ## Export and reference differences
 
 ONNX export preserves FP16, BF16, FP32 and FP64 graph dtypes. Local ONNX Runtime
-1.23.2 CPU executes FP16/FP32 spatial ranks 2-4; its FP64/BF16 Conv kernels are
-unavailable. Other versions/providers may differ. Complex tensor interfaces are
+1.23.2 CPU executes FP16/FP32 spatial ranks 2-4 and FP32 rank 5, partial layers
+included; its FP64/BF16 Conv kernels are unavailable. Other versions/providers may differ. Complex tensor interfaces are
 outside the [ONNX Conv schema](https://onnx.ai/onnx/operators/onnx__Conv.html);
 provide an explicit real/imaginary model interface when required.
 

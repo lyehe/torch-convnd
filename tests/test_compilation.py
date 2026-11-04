@@ -6,7 +6,7 @@ import pytest
 import torch
 from torch.utils.cpp_extension import CUDA_HOME
 
-from torch_convnd import Conv2d, Conv3d, Conv4d
+from torch_convnd import Conv2d, Conv3d, Conv4d, ConvNd, PartialConvNd
 from torch_convnd.convnd import _build_environment
 
 CUDA = CUDA_HOME is not None and torch.cuda.is_available()
@@ -122,6 +122,33 @@ def test_inductor_four_dimensional_training(backend, device, amp):
         second = torch.autograd.grad(expected, (input, *reference.parameters()), cotangent)
     for observed, target in zip(first, second, strict=True):
         torch.testing.assert_close(observed, target, atol=tolerance, rtol=tolerance)
+
+
+@pytest.mark.parametrize("device", DEVICES)
+@pytest.mark.parametrize("kind", ["zeros", "partial", "masked"])
+def test_inductor_rank_five_and_partial_layers(device, kind):
+    """The default compiler handles native rank-5 layers and both partial forms."""
+    if device == "cuda" and importlib.util.find_spec("triton") is None:
+        pytest.skip("CUDA Inductor requires a matching Triton installation")
+    torch._dynamo.reset()
+    if kind == "masked":
+        layer = PartialConvNd(4, 6, 3, padding=1, groups=2, dimensions=5, multi_channel=True)
+    else:
+        layer = ConvNd(4, 6, 3, padding=1, groups=2, padding_mode=kind, dimensions=5)
+    layer = layer.to(device)
+    input = torch.randn((2, 4) + (4,) * 5, device=device, requires_grad=True)
+    arguments = (input,)
+    if kind == "masked":
+        arguments += ((torch.rand((2, 4) + (4,) * 5, device=device) > 0.3).float(),)
+    with _build_environment(device == "cuda"):
+        compiled = torch.compile(layer, fullgraph=True)
+        actual, expected = compiled(*arguments), layer(*arguments)
+        torch.testing.assert_close(actual, expected, atol=2e-5, rtol=2e-5)
+        cotangent = torch.randn_like(actual) / actual.numel() ** 0.5
+        first = torch.autograd.grad(actual, (input, *layer.parameters()), cotangent)
+        second = torch.autograd.grad(expected, (input, *layer.parameters()), cotangent)
+    for observed, target in zip(first, second, strict=True):
+        torch.testing.assert_close(observed, target, atol=2e-5, rtol=2e-5)
 
 
 @pytest.mark.parametrize("backend", ["auto", "native", "torch"])

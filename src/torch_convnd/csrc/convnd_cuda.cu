@@ -170,8 +170,10 @@ __global__ void fold_gather_kernel(const scalar_t* columns, scalar_t* output, Ge
 
 }  // namespace
 
-void unfold_cuda(const at::Tensor& input, at::Tensor& columns, const Geometry& geometry,
+void unfold_cuda(const at::Tensor& input, at::Tensor& columns, const Geometry& full_geometry,
                  int64_t start, int64_t length) {
+  // Dropping unit axes lets more high-rank problems use the per-rank fast kernels.
+  const Geometry geometry = without_unit_axes(full_geometry);
   const auto stream = c10::cuda::getCurrentCUDAStream();
   AT_DISPATCH_FLOATING_TYPES_AND2(at::kHalf, at::kBFloat16, input.scalar_type(),
                                 "unfold_nd_cuda", [&] {
@@ -188,8 +190,9 @@ void unfold_cuda(const at::Tensor& input, at::Tensor& columns, const Geometry& g
   C10_CUDA_KERNEL_LAUNCH_CHECK();
 }
 
-void fold_cuda(const at::Tensor& columns, at::Tensor& output, const Geometry& geometry,
+void fold_cuda(const at::Tensor& columns, at::Tensor& output, const Geometry& full_geometry,
                int64_t start, int64_t length) {
+  const Geometry geometry = without_unit_axes(full_geometry);
   const auto stream = c10::cuda::getCurrentCUDAStream();
   AT_DISPATCH_FLOATING_TYPES(output.scalar_type(), "fold_nd_cuda", [&] {
     if (at::globalContext().deterministicAlgorithms()) {
