@@ -1,6 +1,8 @@
 """Keep caller GPU selection and configure deterministic CUDA matrix multiplication."""
 
+import ctypes
 import os
+import sys
 
 import pytest
 import torch
@@ -11,6 +13,11 @@ from torch_convnd import load_native
 def pytest_configure(config):
     """Configure deterministic matrix multiplication before the first CUDA operation."""
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+    if sys.platform == "win32" and os.environ.get("TORCH_CONVND_CRASH_DUMPS"):
+        # tools/crash_dumps.ps1 has Windows Error Reporting keep crash dumps, which it
+        # cannot do for a process with SEM_NOGPFAULTERRORBOX; children inherit the mode.
+        kernel32 = ctypes.windll.kernel32
+        kernel32.SetErrorMode(kernel32.GetErrorMode() & ~0x0002)
 
 
 @pytest.fixture(scope="session")

@@ -75,6 +75,9 @@ ASAN_OPTIONS=detect_leaks=0 python tools/sanitize_native.py -q tests/test_native
 Windows CI jobs keep a minidump of any interpreter crash (`tools/crash_dumps.ps1`)
 and upload it, with the built addon, when the job fails. Each job first crashes a
 throwaway interpreter to confirm that its runner writes dumps, and warns if not.
+Runner processes can inherit `SEM_NOGPFAULTERRORBOX`, which keeps Windows Error
+Reporting from writing dumps, so the script sets `TORCH_CONVND_CRASH_DUMPS=1` and
+the test session clears that flag.
 
 ## Archive a run
 
