@@ -93,10 +93,6 @@ def conv_nd(
     additionally allocate indexing tensors. Backward recomputes patches.
     """
     rank = weight.ndim - 2
-    if backend not in BACKENDS:
-        raise ValueError(f"Invalid backend {backend!r}; expected 'auto', 'native' or 'torch'")
-    if workspace_bytes <= 0:
-        raise ValueError("workspace_bytes must be positive")
     if not 1 <= rank <= 62:
         message = "weight must have output/input channels and 1-62 spatial dimensions"
         raise ValueError(message)
@@ -107,8 +103,7 @@ def conv_nd(
         input = input.unsqueeze(0)
     stride, dilation = _tuple(stride, rank, "stride"), _tuple(dilation, rank, "dilation")
     padding = padding if isinstance(padding, str) else _tuple(padding, rank, "padding")
-    if padding_mode not in _PADDING_MODES:
-        raise ValueError(f"Invalid padding_mode {padding_mode!r}")
+    _check_options(padding_mode, workspace_bytes, backend)
     if padding_mode == "partial":
         # The mask-free partial convolution; it validates and pads with zeros itself.
         output, _ = _partial_conv_nd(
@@ -127,6 +122,28 @@ def conv_nd(
             need_update=False,
         )
         return output.squeeze(0) if unbatched else output
+    amp = _check_arguments(input, weight, stride, padding, dilation, groups)
+    _check_bias(input, weight, bias, amp)
+    pairs = padding_pairs(padding, weight.shape[2:], stride, dilation)
+    output = _execute(
+        input, weight, bias, stride, pairs, dilation, groups, padding_mode, workspace_bytes, backend
+    )
+    return output.squeeze(0) if unbatched else output
+
+
+def _check_options(padding_mode, workspace_bytes, backend):
+    """conv_nd's checks of the options that select padding and kernels."""
+    if backend not in BACKENDS:
+        raise ValueError(f"Invalid backend {backend!r}; expected 'auto', 'native' or 'torch'")
+    if workspace_bytes <= 0:
+        raise ValueError("workspace_bytes must be positive")
+    if padding_mode not in _PADDING_MODES:
+        raise ValueError(f"Invalid padding_mode {padding_mode!r}")
+
+
+def _check_arguments(input, weight, stride, padding, dilation, groups):
+    """conv_nd's geometry, device and dtype checks of a batched input; returns whether
+    autocast applies on its device."""
     if min(*stride, *dilation) <= 0 or (not isinstance(padding, str) and min(padding) < 0):
         raise RuntimeError("stride and dilation must be positive; padding must be nonnegative")
     if groups <= 0:
@@ -148,12 +165,7 @@ def conv_nd(
         amp and input.dtype in _CASTABLE and weight.dtype in _CASTABLE
     ):
         raise RuntimeError("input and weight must have the same device and dtype")
-    _check_bias(input, weight, bias, amp)
-    pairs = padding_pairs(padding, weight.shape[2:], stride, dilation)
-    output = _execute(
-        input, weight, bias, stride, pairs, dilation, groups, padding_mode, workspace_bytes, backend
-    )
-    return output.squeeze(0) if unbatched else output
+    return amp
 
 
 def _execute(
@@ -389,7 +401,7 @@ def _count(
     ``channels`` is the map's channel count as a plain int, so exporters that trace
     sizes still see a counting kernel of static shape.
     """
-    ones = torch.ones((channels, 1, *kernel), dtype=valid.dtype, device=valid.device)
+    ones = _counting_kernel(valid, channels, kernel)
     with autocast_disabled(valid.device.type):
         return _execute(
             valid,
@@ -403,6 +415,30 @@ def _count(
             workspace_bytes,
             backend,
         )
+
+
+def _counting_kernel(valid, channels, kernel):
+    """_count's all-ones kernel; eager CPU and CUDA calls keep one per stream.
+
+    Compilers, functorch transforms, fake or mode-dispatched tensors and CUDA graph
+    capture build their own, as they do the cached counts.
+    """
+    device = valid.device
+    if (
+        is_compiling()
+        or not plain_tensor(valid)
+        or device.type not in {"cpu", "cuda"}
+        or is_capturing(device)
+    ):
+        return torch.ones((channels, 1, *kernel), dtype=valid.dtype, device=device)
+    return _cached_ones(channels, kernel, valid.dtype, device, current_stream_id(device))
+
+
+@functools.lru_cache(maxsize=64)
+def _cached_ones(channels, kernel, dtype, device, stream):
+    """_counting_kernel's eager kernel, kept per device stream."""
+    with _outside_inference(), torch.no_grad():
+        return torch.ones((channels, 1, *kernel), dtype=dtype, device=device)
 
 
 def _partial_conv_nd(
@@ -511,9 +547,13 @@ def _partial_conv_nd(
             else:
                 valid = valid.reshape(*shape, *spatial).sum(2)
         window = math.prod(kernel) * (per_group if multi_channel else 1)
-    # The data convolution validates the geometry before the counts reuse it.
+    # conv_nd's checks, once: the data and count convolutions share the checked geometry.
+    _check_options(padding_mode, workspace_bytes, backend)
+    _check_arguments(input, weight, steps, pads, spacings, groups)
     data = input if mask is None else input * cast
-    output = conv_nd(data, weight, None, stride, padding, dilation, groups, **options)
+    output = _execute(
+        data, weight, None, steps, pairs, spacings, groups, padding_mode, workspace_bytes, backend
+    )
     produced = output.dtype
     level = _REAL.get(produced, produced)
     # Only float16's range is small enough for a window (many channels per group) to

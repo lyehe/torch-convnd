@@ -26,6 +26,27 @@ struct Geometry {
   int64_t dilation[kMaxSpatialDims] = {};
 };
 
+// An axis with one sample, a one-tap kernel and no padding puts every patch element at
+// coordinate 0, so index arithmetic can skip it; volumes and layouts are unchanged. One
+// axis is always kept.
+inline Geometry without_unit_axes(const Geometry& geometry) {
+  Geometry result = geometry;
+  result.rank = 0;
+  for (int64_t axis = 0; axis < geometry.rank; ++axis) {
+    const bool unit = geometry.input[axis] == 1 && geometry.kernel[axis] == 1 &&
+                      geometry.padding[axis] == 0;
+    if (unit && (result.rank > 0 || axis + 1 < geometry.rank)) continue;
+    result.input[result.rank] = geometry.input[axis];
+    result.output[result.rank] = geometry.output[axis];
+    result.kernel[result.rank] = geometry.kernel[axis];
+    result.stride[result.rank] = geometry.stride[axis];
+    result.padding[result.rank] = geometry.padding[axis];
+    result.dilation[result.rank] = geometry.dilation[axis];
+    ++result.rank;
+  }
+  return result;
+}
+
 #ifdef __CUDACC__
 #define TORCH_CONVND_HD __host__ __device__
 #else

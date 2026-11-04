@@ -43,3 +43,38 @@ def test_native_partial_matches_portable_with_gradients(device, rank, multi_chan
         results.append((output, update, *gradients))
     for native, portable in zip(*results, strict=True):
         torch.testing.assert_close(native, portable, rtol=1e-10, atol=1e-10)
+
+
+@pytest.mark.parametrize("device", DEVICES)
+@pytest.mark.parametrize("rank", [9, 16, 42])
+@pytest.mark.parametrize("multi_channel", [False, True])
+def test_native_partial_beyond_the_per_rank_kernels(device, rank, multi_channel):
+    """Above rank 8 CUDA leaves its per-rank kernels; one-sample axes are skipped when
+    unpadded and kept when padded. Native and portable results agree."""
+    generator = torch.Generator().manual_seed(rank)
+    options = {"dtype": torch.float64, "device": device}
+    size, kernel, padding = [1] * rank, [1] * rank, [0] * rank
+    for axis, length, taps in ((0, 5, 3), (rank // 2, 4, 2), (rank - 1, 6, 3)):
+        size[axis], kernel[axis], padding[axis] = length, taps, 1
+    padding[1] = 1
+    input = torch.randn((2, 4, *size), generator=generator).to(**options)
+    weight = torch.randn((4, 2, *kernel), generator=generator).to(**options)
+    bias = torch.randn(4, generator=generator).to(**options)
+    channels = 4 if multi_channel else 1
+    mask = (torch.rand((2, channels, *size), generator=generator) > 0.3).to(**options)
+    results = []
+    for backend in ("native", "torch"):
+        leaves = [value.detach().requires_grad_() for value in (input, weight, bias)]
+        output, update = partial_conv_nd(
+            *leaves,
+            stride=(1,) * (rank - 1) + (2,),
+            padding=padding,
+            groups=2,
+            mask=mask,
+            multi_channel=multi_channel,
+            backend=backend,
+        )
+        gradients = torch.autograd.grad(output.square().sum(), leaves)
+        results.append((output, update, *gradients))
+    for native, portable in zip(*results, strict=True):
+        torch.testing.assert_close(native, portable, rtol=1e-10, atol=1e-10)

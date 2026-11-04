@@ -44,6 +44,32 @@
   `zip(strict=True)`, so those releases compile with graph breaks.
 - Check the native kernels under AddressSanitizer and UBSan in CI
   (`tools/sanitize_native.py`).
+- Run the native CPU kernels on PyTorch's intra-op threads. Under PyTorch's default
+  OpenMP backend they ran serially, since `at::parallel_for` in an extension compiled
+  without OpenMP flags is a plain loop, and decoded each element's position by
+  integer division on every axis. Each thread now decodes its first element and steps
+  through the rest, and axes with one sample, a one-tap kernel and no padding are
+  skipped on CPU and CUDA, so CUDA problems with at most eight other axes use the
+  per-rank kernels at any rank. Values are bitwise unchanged. On four threads, the
+  automatic CPU choice at ranks 5 and 6 went from 14-17 times slower than the PyTorch
+  backend to 5.3-5.4 times faster.
+- Check partial-convolution arguments once per call, and reuse the all-ones counting
+  kernel across eager CPU and CUDA calls (one per stream; compilers, functorch
+  transforms, fake tensors and CUDA graph capture build their own). Eager training
+  steps of small partial layers are about 2-3% faster.
+- Test partial convolution at ranks 5 to 42: against NVIDIA's arithmetic in every
+  padding mode, and natively against the portable backend beyond CUDA's per-rank
+  kernels. Also test inductor compilation of rank-5 native and partial layers, ONNX
+  Runtime execution at rank 5 with partial layers, and two-process data-parallel
+  gradients over Gloo where the PyTorch build provides a Gloo transport (PyTorch
+  2.10's Windows wheels do not).
+- Keep minidumps of interpreter crashes in Windows CI and upload them with the built
+  addon when a job fails (`tools/crash_dumps.ps1`); each job first confirms that its
+  runner writes dumps. Runner processes inherit `SEM_NOGPFAULTERRORBOX`, which keeps
+  Windows Error Reporting from writing dumps, so the test session clears it there.
+- Explain the Windows CI illegal-instruction crash: on GitHub's Emerald Rapids
+  Windows runners, oneDNN's AMX bfloat16 kernels fault at their first tile
+  instruction. CI keeps oneDNN below AMX there (`ONEDNN_MAX_CPU_ISA`).
 - Export bias-free 3-D convolutions that ONNX Runtime accepts. onnxscript's `conv3d`
   translation, used by PyTorch 2.6's Dynamo exporter, writes a `[C_out, 2]` zero bias
   copied from its complex variant; `export_onnx` now supplies a correct one, which

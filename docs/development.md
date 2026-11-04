@@ -33,7 +33,8 @@ python -m mkdocs build --strict
   AMP, higher derivatives, transforms, compilers, serialization and ONNX execution.
 - Finite differences check derivatives independently of another autodiff formula.
 - Integration regressions cover compiler-free imports/training, automatic fallback,
-  explicit-native errors, checkpointing, state-dictionary transfer and type checking.
+  explicit-native errors, checkpointing, state-dictionary transfer, type checking and
+  two-process data-parallel training.
 - Built wheel checks run in isolated Python with a required `site-packages` import.
   Distribution checks validate metadata, every bundled source, native files,
   typing metadata and version/tag agreement.
@@ -70,6 +71,13 @@ which builds a separately cached, sanitized addon:
 LD_PRELOAD="$(gcc -print-file-name=libasan.so) $(gcc -print-file-name=libubsan.so)" \
 ASAN_OPTIONS=detect_leaks=0 python tools/sanitize_native.py -q tests/test_native_compatibility.py
 ```
+
+Windows CI jobs keep a minidump of any interpreter crash (`tools/crash_dumps.ps1`)
+and upload it, with the built addon, when the job fails. Each job first crashes a
+throwaway interpreter to confirm that its runner writes dumps, and warns if not.
+Runner processes can inherit `SEM_NOGPFAULTERRORBOX`, which keeps Windows Error
+Reporting from writing dumps, so the script sets `TORCH_CONVND_CRASH_DUMPS=1` and
+the test session clears that flag.
 
 ## Archive a run
 
